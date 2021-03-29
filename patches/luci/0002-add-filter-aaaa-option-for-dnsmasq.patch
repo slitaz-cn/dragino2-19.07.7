@@ -1,0 +1,47 @@
+From 8cc36c1b6a0fc07199a8dc6fbf2132d479e6a535 Mon Sep 17 00:00:00 2001
+From: slitaz-cn <teasiu@163.com>
+Date: Tue, 30 Mar 2021 00:48:16 +0800
+Subject: [PATCH 2/4] add filter-aaaa option for dnsmasq
+
+Signed-off-by: slitaz-cn <teasiu@163.com>
+---
+ modules/luci-base/po/zh_Hans/base.po                        | 6 ++++++
+ .../htdocs/luci-static/resources/view/network/dhcp.js       | 5 +++++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/modules/luci-base/po/zh_Hans/base.po b/modules/luci-base/po/zh_Hans/base.po
+index fcfbe1fb4..bb8f6e590 100644
+--- a/modules/luci-base/po/zh_Hans/base.po
++++ b/modules/luci-base/po/zh_Hans/base.po
+@@ -427,6 +427,12 @@ msgstr "额外的 HOSTS 文件"
+ msgid "Additional servers file"
+ msgstr "额外的 SERVERS 文件"
+ 
++msgid "Filter IPv6 Records"
++msgstr "过滤 IPv6 记录"
++
++msgid "Filter IPv6(AAAA) Records during DNS resolution"
++msgstr "在域名解析时，过滤 IPv6(AAAA) 记录"
++
+ #: modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/30_network.js:34
+ #: modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/30_network.js:35
+ #: modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/30_network.js:36
+diff --git a/modules/luci-mod-network/htdocs/luci-static/resources/view/network/dhcp.js b/modules/luci-mod-network/htdocs/luci-static/resources/view/network/dhcp.js
+index 6693dc0ea..1c8f94375 100644
+--- a/modules/luci-mod-network/htdocs/luci-static/resources/view/network/dhcp.js
++++ b/modules/luci-mod-network/htdocs/luci-static/resources/view/network/dhcp.js
+@@ -199,6 +199,11 @@ return view.extend({
+ 		s.taboption('files', form.DynamicList, 'addnhosts',
+ 			_('Additional Hosts files')).optional = true;
+ 
++		o = s.taboption('advanced', form.Flag, 'filteraaaa',
++			_('Filter IPv6 Records'),
++			_('Filter IPv6(AAAA) Records during DNS resolution'));
++		o.optional = true;
++
+ 		o = s.taboption('advanced', form.Flag, 'quietdhcp',
+ 			_('Suppress logging'),
+ 			_('Suppress logging of the routine operation of these protocols'));
+-- 
+2.25.1
+

@@ -1,0 +1,55 @@
+From f696514f490d779f6662b83db182415fc06aac22 Mon Sep 17 00:00:00 2001
+From: slitaz-cn <teasiu@163.com>
+Date: Tue, 30 Mar 2021 02:09:59 +0800
+Subject: [PATCH] set uhttpd 8082 and 8083
+
+Signed-off-by: slitaz-cn <teasiu@163.com>
+---
+ .../network/services/uhttpd/files/uhttpd.config | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/package/network/services/uhttpd/files/uhttpd.config b/package/network/services/uhttpd/files/uhttpd.config
+index 39089ca25b..ca7a302353 100644
+--- a/package/network/services/uhttpd/files/uhttpd.config
++++ b/package/network/services/uhttpd/files/uhttpd.config
+@@ -2,8 +2,8 @@
+ config uhttpd main
+ 
+ 	# HTTP listen addresses, multiple allowed
+-	list listen_http	0.0.0.0:80
+-	list listen_http	[::]:80
++	list listen_http	0.0.0.0:8083
++	list listen_http	[::]:8083
+ 
+ 	# HTTPS listen addresses, multiple allowed
+ 	list listen_https	0.0.0.0:443
+@@ -46,6 +46,7 @@ config uhttpd main
+ 	# Files with an associated interpreter can
+ 	# be called outside of the CGI prefix and do
+ 	# not need to be executable.
++	list index_page	"cgi-bin/luci"
+ #	list interpreter	".php=/usr/bin/php-cgi"
+ #	list interpreter	".cgi=/usr/bin/perl"
+ 
+@@ -111,7 +112,17 @@ config uhttpd main
+ 	# resources.
+ #	list httpauth prefix_user
+ 
+-
++config uhttpd web
++	option tcp_keepalive '1'
++	# HTTP listen addresses, multiple allowed
++	list listen_http	0.0.0.0:8082
++	list listen_http	[::]:8082
++	option redirect_https '0'
++	option rfc1918_filter '0'
++	list index_page 'index.html'
++	list interpreter '.php=/usr/bin/php-cgi'
++	option home '/mnt/sda1/web'
++	
+ # Defaults for automatic certificate and key generation
+ config cert defaults
+ 
+-- 
+2.25.1
+

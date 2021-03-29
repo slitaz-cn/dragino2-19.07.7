@@ -1,0 +1,122 @@
+From 0b5c1632f442bb748b40f8554ed9d9bc74997258 Mon Sep 17 00:00:00 2001
+From: slitaz-cn <teasiu@163.com>
+Date: Tue, 30 Mar 2021 01:07:21 +0800
+Subject: [PATCH 4/4] add realtime CPU information display
+
+Signed-off-by: slitaz-cn <teasiu@163.com>
+---
+ modules/luci-base/po/zh_Hans/base.po                |  6 ++++++
+ modules/luci-base/root/usr/libexec/rpcd/luci        | 13 +++++++++++++
+ .../root/usr/share/rpcd/acl.d/luci-base.json        |  2 +-
+ .../resources/view/status/include/10_system.js      | 13 +++++++++++--
+ 4 files changed, 31 insertions(+), 3 deletions(-)
+
+diff --git a/modules/luci-base/po/zh_Hans/base.po b/modules/luci-base/po/zh_Hans/base.po
+index bb8f6e590..5f4a87196 100644
+--- a/modules/luci-base/po/zh_Hans/base.po
++++ b/modules/luci-base/po/zh_Hans/base.po
+@@ -896,6 +896,12 @@ msgstr "CA 证书，如果留空，则证书将在第一次连接后被保存。
+ msgid "CLAT configuration failed"
+ msgstr "CLAT 配置失败"
+ 
++msgid "CPU Status"
++msgstr "CPU 状态"
++
++msgid "CPU Usage"
++msgstr "CPU 使用率"
++
+ #: modules/luci-mod-status/htdocs/luci-static/resources/view/status/processes.js:72
+ msgid "CPU usage (%)"
+ msgstr "CPU 使用率（%）"
+diff --git a/modules/luci-base/root/usr/libexec/rpcd/luci b/modules/luci-base/root/usr/libexec/rpcd/luci
+index 35b85d43d..7cca65fe0 100755
+--- a/modules/luci-base/root/usr/libexec/rpcd/luci
++++ b/modules/luci-base/root/usr/libexec/rpcd/luci
+@@ -612,6 +612,19 @@ local methods = {
+ 			end
+ 			return { result = res }
+ 		end
++	},
++
++	getCPUInfo = {
++		call = function()
++			local sys = require "luci.sys"
++			local cpuinfo = {}
++
++			cpuinfo.freq = sys.exec([[awk '{ printf("%d MHz", $0 / 1000) }' /sys/devices/system/cpu/cpufreq/policy0/cpuinfo_cur_freq]])
++			cpuinfo.temp = sys.exec([[awk '{ printf("%.1f °C", $0 / 1000) }' /sys/class/thermal/thermal_zone0/temp]])
++			cpuinfo.usage = sys.exec([[top -n1 | awk '/^CPU/ { printf("%d%%", 100 - $8) }']])
++
++			return cpuinfo
++		end
+ 	}
+ }
+ 
+diff --git a/modules/luci-base/root/usr/share/rpcd/acl.d/luci-base.json b/modules/luci-base/root/usr/share/rpcd/acl.d/luci-base.json
+index 8b8481b1c..56aa052ea 100644
+--- a/modules/luci-base/root/usr/share/rpcd/acl.d/luci-base.json
++++ b/modules/luci-base/root/usr/share/rpcd/acl.d/luci-base.json
+@@ -62,7 +62,7 @@
+ 			"ubus": {
+ 				"file": [ "list", "read", "stat" ],
+ 				"iwinfo": [ "assoclist", "freqlist", "txpowerlist", "countrylist" ],
+-				"luci": [ "getConntrackList", "getInitList", "getLocaltime", "getProcessList", "getRealtimeStats", "getTimezones", "getLEDs", "getUSBDevices", "getSwconfigFeatures", "getSwconfigPortState", "getBlockDevices", "getMountPoints" ],
++				"luci": [ "getConntrackList", "getInitList", "getLocaltime", "getProcessList", "getRealtimeStats", "getTimezones", "getLEDs", "getUSBDevices", "getSwconfigFeatures", "getSwconfigPortState", "getBlockDevices", "getMountPoints", "getCPUInfo" ],
+ 				"luci-rpc": [ "getBoardJSON", "getDHCPLeases", "getDSLStatus", "getDUIDHints", "getHostHints", "getNetworkDevices", "getWirelessDevices" ],
+ 				"network.interface": [ "dump" ],
+ 				"network.rrdns": [ "lookup" ],
+diff --git a/modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/10_system.js b/modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/10_system.js
+index 942b2dd56..0d0e1a0b0 100644
+--- a/modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/10_system.js
++++ b/modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/10_system.js
+@@ -13,6 +13,11 @@ var callSystemInfo = rpc.declare({
+ 	method: 'info'
+ });
+ 
++var callLuciCPUInfo = rpc.declare({
++	object: 'luci',
++	method: 'getCPUInfo'
++});
++
+ return baseclass.extend({
+ 	title: _('System'),
+ 
+@@ -20,6 +25,7 @@ return baseclass.extend({
+ 		return Promise.all([
+ 			L.resolveDefault(callSystemBoard(), {}),
+ 			L.resolveDefault(callSystemInfo(), {}),
++			L.resolveDefault(callLuciCPUInfo(), {}),
+ 			fs.lines('/usr/lib/lua/luci/version.lua')
+ 		]);
+ 	},
+@@ -27,7 +33,8 @@ return baseclass.extend({
+ 	render: function(data) {
+ 		var boardinfo   = data[0],
+ 		    systeminfo  = data[1],
+-		    luciversion = data[2];
++		    cpuinfo     = data[2],
++		    luciversion = data[3];
+ 
+ 		luciversion = luciversion.filter(function(l) {
+ 			return l.match(/^\s*(luciname|luciversion)\s*=/);
+@@ -54,6 +61,7 @@ return baseclass.extend({
+ 			_('Hostname'),         boardinfo.hostname,
+ 			_('Model'),            boardinfo.model,
+ 			_('Architecture'),     boardinfo.system,
++			_('CPU Status'),       cpuinfo.freq && cpuinfo.temp && cpuinfo.freq + ', ' + cpuinfo.temp,
+ 			_('Firmware Version'), (L.isObject(boardinfo.release) ? boardinfo.release.description + ' / ' : '') + (luciversion || ''),
+ 			_('Kernel Version'),   boardinfo.kernel,
+ 			_('Local Time'),       datestr,
+@@ -62,7 +70,8 @@ return baseclass.extend({
+ 				systeminfo.load[0] / 65535.0,
+ 				systeminfo.load[1] / 65535.0,
+ 				systeminfo.load[2] / 65535.0
+-			) : null
++			) : null,
++			_('CPU Usage'),        cpuinfo.usage
+ 		];
+ 
+ 		var table = E('div', { 'class': 'table' });
+-- 
+2.25.1
+

@@ -1,0 +1,30 @@
+From 79f40d9fd270806b793952d5127873b0ffb0f53e Mon Sep 17 00:00:00 2001
+From: slitaz-cn <teasiu@163.com>
+Date: Tue, 30 Mar 2021 02:04:05 +0800
+Subject: [PATCH] update transmission-contrl 1.61
+
+Signed-off-by: slitaz-cn <teasiu@163.com>
+---
+ net/transmission-web-control/Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/net/transmission-web-control/Makefile b/net/transmission-web-control/Makefile
+index 7547dbde2..ab9457b8c 100644
+--- a/net/transmission-web-control/Makefile
++++ b/net/transmission-web-control/Makefile
+@@ -5,9 +5,9 @@ PKG_RELEASE:=1
+ 
+ PKG_SOURCE_PROTO:=git
+ PKG_SOURCE_URL:=https://github.com/ronggang/transmission-web-control
+-PKG_SOURCE_DATE:=2019-04-16
+-PKG_SOURCE_VERSION:=a747a87babb246b0d3e6dd108ad7b4c19462cfe6
+-PKG_MIRROR_HASH:=90a2e33bd799a13504881e26980823fa181b47918900fc4ef03ae3daf0625f14
++PKG_SOURCE_DATE:=2020-09-13
++PKG_SOURCE_VERSION:=c26a0761e3a8fe3cff2480735ec363dc253c5105
++PKG_MIRROR_HASH:=skip
+ 
+ PKG_LICENSE:=MIT
+ PKG_LICENSE_FILES:=LICENSE
+-- 
+2.25.1
+

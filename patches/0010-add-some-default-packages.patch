@@ -1,0 +1,31 @@
+From ccef685ae1981e68cdd37aa8b5a8b4c364ce5390 Mon Sep 17 00:00:00 2001
+From: slitaz-cn <teasiu@163.com>
+Date: Mon, 29 Mar 2021 21:22:23 +0800
+Subject: [PATCH 10/10] add some default packages
+
+Signed-off-by: slitaz-cn <teasiu@163.com>
+---
+ include/target.mk | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/target.mk b/include/target.mk
+index 2a81a7fc80..6e58c5d2fc 100644
+--- a/include/target.mk
++++ b/include/target.mk
+@@ -13,11 +13,11 @@ __target_inc=1
+ DEVICE_TYPE?=router
+ 
+ # Default packages - the really basic set
+-DEFAULT_PACKAGES:=base-files libc libgcc busybox dropbear mtd uci bash opkg netifd fstools uclient-fetch logd urandom-seed urngd
++DEFAULT_PACKAGES:=base-files libc libgcc busybox dropbear mtd uci bash luci wget curl luci-compat block-mount fdisk lsblk bind-client opkg netifd fstools uclient-fetch logd urandom-seed urngd
+ # For nas targets
+ DEFAULT_PACKAGES.nas:=block-mount fdisk lsblk mdadm
+ # For router targets
+-DEFAULT_PACKAGES.router:=dnsmasq iptables ip6tables ppp ppp-mod-pppoe firewall odhcpd-ipv6only odhcp6c kmod-ipt-offload
++DEFAULT_PACKAGES.router:=dnsmasq-full iptables ip6tables ppp ppp-mod-pppoe firewall odhcpd-ipv6only odhcp6c kmod-ipt-offload
+ DEFAULT_PACKAGES.bootloader:=
+ 
+ ifneq ($(DUMP),)
+-- 
+2.25.1
+

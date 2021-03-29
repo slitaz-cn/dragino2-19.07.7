@@ -1,0 +1,52 @@
+From 0774af368e4f362b048534225fb70ae2245024bc Mon Sep 17 00:00:00 2001
+From: slitaz-cn <teasiu@163.com>
+Date: Tue, 30 Mar 2021 01:14:05 +0800
+Subject: [PATCH 5/5] set default luci-chinese
+
+Signed-off-by: slitaz-cn <teasiu@163.com>
+---
+ collections/luci/Makefile              | 2 +-
+ modules/luci-base/root/etc/config/luci | 2 +-
+ modules/luci-base/root/www/index.html  | 3 +--
+ 3 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/collections/luci/Makefile b/collections/luci/Makefile
+index 739eb51bc..2ec69d263 100644
+--- a/collections/luci/Makefile
++++ b/collections/luci/Makefile
+@@ -12,7 +12,7 @@ LUCI_BASENAME:=luci
+ LUCI_TITLE:=LuCI interface with Uhttpd as Webserver (default)
+ LUCI_DESCRIPTION:=Standard OpenWrt set including full admin with ppp support and the default Bootstrap theme
+ LUCI_DEPENDS:= \
+-	+uhttpd +luci-mod-admin-full +luci-theme-bootstrap \
++	+uhttpd +luci-mod-admin-full +luci-theme-argon \
+ 	+luci-app-firewall +luci-app-opkg +luci-proto-ppp +libiwinfo-lua +IPV6:luci-proto-ipv6 \
+ 	+rpcd-mod-rrdns
+ 
+diff --git a/modules/luci-base/root/etc/config/luci b/modules/luci-base/root/etc/config/luci
+index 46947ae4c..bbfd4c866 100644
+--- a/modules/luci-base/root/etc/config/luci
++++ b/modules/luci-base/root/etc/config/luci
+@@ -1,5 +1,5 @@
+ config core main
+-	option lang auto
++	option lang zh_cn
+ 	option mediaurlbase /luci-static/bootstrap
+ 	option resourcebase /luci-static/resources
+ 	option ubuspath /ubus/
+diff --git a/modules/luci-base/root/www/index.html b/modules/luci-base/root/www/index.html
+index 35c0ea0d3..2040de064 100644
+--- a/modules/luci-base/root/www/index.html
++++ b/modules/luci-base/root/www/index.html
+@@ -5,7 +5,6 @@
+ <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+ <meta http-equiv="refresh" content="0; URL=cgi-bin/luci/" />
+ </head>
+-<body style="background-color: white">
+-<a style="color: black; font-family: arial, helvetica, sans-serif;" href="cgi-bin/luci/">LuCI - Lua Configuration Interface</a>
++<body>
+ </body>
+ </html>
+-- 
+2.25.1
+

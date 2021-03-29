@@ -1,0 +1,37 @@
+From 500676c25f618e16c832db68b4316340600e0287 Mon Sep 17 00:00:00 2001
+From: slitaz-cn <teasiu@163.com>
+Date: Tue, 30 Mar 2021 00:51:01 +0800
+Subject: [PATCH 3/4] luci-base: add nas section menu
+
+Signed-off-by: slitaz-cn <teasiu@163.com>
+---
+ .../root/usr/share/luci/menu.d/luci-base.json         | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/modules/luci-base/root/usr/share/luci/menu.d/luci-base.json b/modules/luci-base/root/usr/share/luci/menu.d/luci-base.json
+index 3b9e2fd99..43f671f8c 100644
+--- a/modules/luci-base/root/usr/share/luci/menu.d/luci-base.json
++++ b/modules/luci-base/root/usr/share/luci/menu.d/luci-base.json
+@@ -50,9 +50,18 @@
+ 		}
+ 	},
+ 
++	"admin/nas": {
++		"title": "NAS",
++		"order": 50,
++		"action": {
++			"type": "firstchild",
++			"recurse": true
++		}
++	},
++
+ 	"admin/network": {
+ 		"title": "Network",
+-		"order": 50,
++		"order": 60,
+ 		"action": {
+ 			"type": "firstchild",
+ 			"recurse": true
+-- 
+2.25.1
+

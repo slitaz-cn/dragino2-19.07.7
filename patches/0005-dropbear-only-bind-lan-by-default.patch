@@ -1,0 +1,23 @@
+From 3c1b8e640c00dfb6040f2d529116f3b7f47f3de8 Mon Sep 17 00:00:00 2001
+From: slitaz-cn <teasiu@163.com>
+Date: Mon, 29 Mar 2021 20:27:54 +0800
+Subject: [PATCH 05/10] dropbear only bind lan by default
+
+Signed-off-by: slitaz-cn <teasiu@163.com>
+---
+ package/network/services/dropbear/files/dropbear.config | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/package/network/services/dropbear/files/dropbear.config b/package/network/services/dropbear/files/dropbear.config
+index 2139ba0bbe..e2a936d7af 100644
+--- a/package/network/services/dropbear/files/dropbear.config
++++ b/package/network/services/dropbear/files/dropbear.config
+@@ -2,4 +2,5 @@ config dropbear
+ 	option PasswordAuth 'on'
+ 	option RootPasswordAuth 'on'
+ 	option Port         '22'
++	option Interface 'lan'
+ #	option BannerFile   '/etc/banner'
+-- 
+2.25.1
+

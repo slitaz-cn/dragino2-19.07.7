@@ -1,0 +1,38 @@
+From 564d591eaecfae926c37475df448e2ac8b2fffe0 Mon Sep 17 00:00:00 2001
+From: slitaz-cn <teasiu@163.com>
+Date: Tue, 30 Mar 2021 02:17:56 +0800
+Subject: [PATCH 2/2] set firewall open 8082 and 8083
+
+Signed-off-by: slitaz-cn <teasiu@163.com>
+---
+ .../network/config/firewall/files/firewall.config  | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/package/network/config/firewall/files/firewall.config b/package/network/config/firewall/files/firewall.config
+index 8874e9882c..54ef12c530 100644
+--- a/package/network/config/firewall/files/firewall.config
++++ b/package/network/config/firewall/files/firewall.config
+@@ -129,6 +129,20 @@ config rule
+ 	option proto		udp
+ 	option target		ACCEPT
+ 
++config rule
++	option name		http8082
++	option proto		tcp
++	option dest_port	8082
++	option target		ACCEPT
++	option src		wan
++
++config rule
++	option name		http8083
++	option proto		tcp
++	option dest_port	8083
++	option target		ACCEPT
++	option src		wan
++	
+ # include a file with users custom iptables rules
+ config include
+ 	option path /etc/firewall.user
+-- 
+2.25.1
+
