@@ -1,0 +1,22 @@
+From b7ac23835c6bd4443f02d60461c366cbc9308b36 Mon Sep 17 00:00:00 2001
+From: slitaz-cn <teasiu@163.com>
+Date: Tue, 30 Mar 2021 14:33:30 +0800
+Subject: [PATCH 4/5] create slitaz dl link to sda1
+
+Signed-off-by: slitaz-cn <teasiu@163.com>
+---
+ modules/luci-base/root/www/dl | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 120000 modules/luci-base/root/www/dl
+
+diff --git a/modules/luci-base/root/www/dl b/modules/luci-base/root/www/dl
+new file mode 120000
+index 000000000..6ba9a736b
+--- /dev/null
++++ b/modules/luci-base/root/www/dl
+@@ -0,0 +1 @@
++/mnt/sda1/dl
+\ No newline at end of file
+-- 
+2.25.1
+

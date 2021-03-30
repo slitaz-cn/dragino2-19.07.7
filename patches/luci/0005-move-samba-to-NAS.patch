@@ -1,0 +1,25 @@
+From 2409243f8a28022a672d5f8832ee480cb5a57af0 Mon Sep 17 00:00:00 2001
+From: slitaz-cn <teasiu@163.com>
+Date: Tue, 30 Mar 2021 14:45:19 +0800
+Subject: [PATCH 5/5] move samba to NAS
+
+Signed-off-by: slitaz-cn <teasiu@163.com>
+---
+ applications/luci-app-samba/luasrc/controller/samba.lua | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/applications/luci-app-samba/luasrc/controller/samba.lua b/applications/luci-app-samba/luasrc/controller/samba.lua
+index 397af6a82..db600e583 100644
+--- a/applications/luci-app-samba/luasrc/controller/samba.lua
++++ b/applications/luci-app-samba/luasrc/controller/samba.lua
+@@ -11,6 +11,6 @@ function index()
+ 
+ 	local page
+ 
+-	page = entry({"admin", "services", "samba"}, cbi("samba"), _("Network Shares"))
++	page = entry({"admin", "nas", "samba"}, cbi("samba"), _("Network Shares"))
+ 	page.dependent = true
+ end
+-- 
+2.25.1
+

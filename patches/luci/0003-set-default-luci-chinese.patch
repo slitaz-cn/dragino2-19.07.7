@@ -1,7 +1,7 @@
-From 0774af368e4f362b048534225fb70ae2245024bc Mon Sep 17 00:00:00 2001
+From 8837d78755f1c80da3d195843296afc8956ba632 Mon Sep 17 00:00:00 2001
 From: slitaz-cn <teasiu@163.com>
-Date: Tue, 30 Mar 2021 01:14:05 +0800
-Subject: [PATCH 5/5] set default luci-chinese
+Date: Tue, 30 Mar 2021 14:31:17 +0800
+Subject: [PATCH 3/5] set default luci chinese
 
 Signed-off-by: slitaz-cn <teasiu@163.com>
 ---
