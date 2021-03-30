@@ -1,7 +1,7 @@
-From 3c1b8e640c00dfb6040f2d529116f3b7f47f3de8 Mon Sep 17 00:00:00 2001
+From fc83f33a3fc0cefbbf5649a19067ff91e7a7e9ec Mon Sep 17 00:00:00 2001
 From: slitaz-cn <teasiu@163.com>
-Date: Mon, 29 Mar 2021 20:27:54 +0800
-Subject: [PATCH 05/10] dropbear only bind lan by default
+Date: Tue, 30 Mar 2021 11:58:50 +0800
+Subject: [PATCH 05/13] dropbear only bind lan by default
 
 Signed-off-by: slitaz-cn <teasiu@163.com>
 ---

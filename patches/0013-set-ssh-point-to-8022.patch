@@ -1,0 +1,42 @@
+From a2178124eed64795da531ba9b950504cb200532d Mon Sep 17 00:00:00 2001
+From: slitaz-cn <teasiu@163.com>
+Date: Tue, 30 Mar 2021 12:13:00 +0800
+Subject: [PATCH 13/13] set ssh point to 8022
+
+Signed-off-by: slitaz-cn <teasiu@163.com>
+---
+ .../config/firewall/files/firewall.config      | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/package/network/config/firewall/files/firewall.config b/package/network/config/firewall/files/firewall.config
+index bbaa2e5193..937cf8b1cf 100644
+--- a/package/network/config/firewall/files/firewall.config
++++ b/package/network/config/firewall/files/firewall.config
+@@ -143,7 +143,23 @@ config rule
+ 	option dest_port	8083
+ 	option target		ACCEPT
+ 	option src		wan
+-	
++
++config rule
++	option name		ssh8022
++	option proto		tcp
++	option dest_port	8022
++	option target		ACCEPT
++	option src		wan
++
++config redirect
++	option target		DNAT
++	option name		ssh
++	option src		wan
++	option src_dport	8022
++	option dest		lan
++	option dest_ip		192.168.33.1
++	option dest_port	22
++		
+ # include a file with users custom iptables rules
+ config include
+ 	option path /etc/firewall.user
+-- 
+2.25.1
+

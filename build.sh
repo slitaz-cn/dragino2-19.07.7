@@ -46,6 +46,7 @@ svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/microsocks custom
 svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/dns2socks custom/dns2socks
 svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/simple-obfs custom/simple-obfs
 svn co https://github.com/fw876/helloworld/trunk/tcping custom/tcping
+svn co https://github.com/fw876/helloworld/trunk/xray-core custom/xray-core
 svn co https://github.com/fw876/helloworld/trunk/shadowsocks-rust custom/shadowsocks-rust
 svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/v2ray-plugin custom/v2ray-plugin
 svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/trojan custom/trojan
@@ -63,21 +64,21 @@ svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/luci-app-arpbind 
 # luci-app-oled
 #git clone --depth 1 https://github.com/NateLol/luci-app-oled.git custom/luci-app-oled
 # luci-app-unblockmusic
-svn co https://github.com/cnsilvan/luci-app-unblockneteasemusic/trunk/luci-app-unblockneteasemusic custom/luci-app-unblockneteasemusic
-svn co https://github.com/cnsilvan/luci-app-unblockneteasemusic/trunk/UnblockNeteaseMusic custom/UnblockNeteaseMusic
+#svn co https://github.com/cnsilvan/luci-app-unblockneteasemusic/trunk/luci-app-unblockneteasemusic custom/luci-app-unblockneteasemusic
+#svn co https://github.com/cnsilvan/luci-app-unblockneteasemusic/trunk/UnblockNeteaseMusic custom/UnblockNeteaseMusic
 # luci-app-autoreboot
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/luci-app-autoreboot custom/luci-app-autoreboot
+#svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/luci-app-autoreboot custom/luci-app-autoreboot
 # luci-app-vsftpd
 
 # luci-app-netdata
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/luci-app-netdata custom/luci-app-netdata
+#svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/luci-app-netdata custom/luci-app-netdata
 # ddns-scripts
 
 # luci-theme-argon
 git clone -b master --depth 1 https://github.com/jerrykuku/luci-theme-argon.git custom/luci-theme-argon
 # luci-app-uugamebooster
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/luci-app-uugamebooster custom/luci-app-uugamebooster
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/uugamebooster custom/uugamebooster
+#svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/luci-app-uugamebooster custom/luci-app-uugamebooster
+#svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/uugamebooster custom/uugamebooster
 # luci-app-admconf
 svn co https://github.com/teasiu/lede-other-apps/trunk/luci-app-admconf custom/luci-app-admconf
 svn co https://github.com/teasiu/lede-other-apps/trunk/luci-app-autoupdate custom/luci-app-autoupdate
@@ -101,7 +102,7 @@ cd "$proj_dir/openwrt"
 
 # customize configs
 cd "$proj_dir/openwrt"
-cat "$proj_dir/config.seed" >.config
+cat "$proj_dir/dragino2.config" >.config
 make defconfig
 
 # build openwrt

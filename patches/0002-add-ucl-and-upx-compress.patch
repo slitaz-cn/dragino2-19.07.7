@@ -1,14 +1,7 @@
-From 63052c2ed3cdc2cb65e99a9ff69dce235b6047c7 Mon Sep 17 00:00:00 2001
+From 8d368f16d1b809de35847a3be15d3df69189a39a Mon Sep 17 00:00:00 2001
 From: slitaz-cn <teasiu@163.com>
-Date: Mon, 29 Mar 2021 20:07:32 +0800
-Subject: [PATCH 02/10] add ucl and upx compresss
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
-	修改：     tools/Makefile
-	新文件：   tools/ucl/Makefile
-	新文件：   tools/upx/Makefile
+Date: Tue, 30 Mar 2021 11:55:27 +0800
+Subject: [PATCH 02/13] add ucl and upx compress
 
 Signed-off-by: slitaz-cn <teasiu@163.com>
 ---

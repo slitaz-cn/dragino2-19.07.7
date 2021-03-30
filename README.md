@@ -5,3 +5,10 @@
 - ipv4: 192.168.33.1
 - username: ecoo
 - password: password
+
+## tips: create patch files
+```
+git add .
+git commit -m "set some change by default"
+git format-patch -s -1,2...
+```
