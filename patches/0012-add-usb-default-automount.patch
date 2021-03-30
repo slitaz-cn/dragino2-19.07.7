@@ -1,7 +1,7 @@
 From 94ff63fb86002c962b62c33d6a4a00efe6bf470a Mon Sep 17 00:00:00 2001
 From: slitaz-cn <teasiu@163.com>
 Date: Tue, 30 Mar 2021 12:04:53 +0800
-Subject: [PATCH 12/13] add usb default automount
+Subject: [PATCH 12/15] add usb default automount
 
 Signed-off-by: slitaz-cn <teasiu@163.com>
 ---

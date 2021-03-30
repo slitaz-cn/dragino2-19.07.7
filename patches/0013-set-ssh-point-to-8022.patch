@@ -1,7 +1,7 @@
 From a2178124eed64795da531ba9b950504cb200532d Mon Sep 17 00:00:00 2001
 From: slitaz-cn <teasiu@163.com>
 Date: Tue, 30 Mar 2021 12:13:00 +0800
-Subject: [PATCH 13/13] set ssh point to 8022
+Subject: [PATCH 13/15] set ssh point to 8022
 
 Signed-off-by: slitaz-cn <teasiu@163.com>
 ---

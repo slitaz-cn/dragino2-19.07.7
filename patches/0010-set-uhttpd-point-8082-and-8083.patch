@@ -1,7 +1,7 @@
 From 766ad93bace40a783c11640eda92a910c279b120 Mon Sep 17 00:00:00 2001
 From: slitaz-cn <teasiu@163.com>
 Date: Tue, 30 Mar 2021 12:03:33 +0800
-Subject: [PATCH 10/13] set uhttpd point 8082 and 8083
+Subject: [PATCH 10/15] set uhttpd point 8082 and 8083
 
 Signed-off-by: slitaz-cn <teasiu@163.com>
 ---

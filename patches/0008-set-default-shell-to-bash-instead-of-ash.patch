@@ -1,7 +1,7 @@
 From 5e81af112695149eb2dea5b5fbeffd072171cd71 Mon Sep 17 00:00:00 2001
 From: slitaz-cn <teasiu@163.com>
 Date: Tue, 30 Mar 2021 12:01:23 +0800
-Subject: [PATCH 08/13] set default shell to bash instead of ash
+Subject: [PATCH 08/15] set default shell to bash instead of ash
 
 Signed-off-by: slitaz-cn <teasiu@163.com>
 ---

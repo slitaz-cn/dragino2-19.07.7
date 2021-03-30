@@ -1,7 +1,7 @@
 From 820d804b681f2ed78c8ff0f808eb8168ef007754 Mon Sep 17 00:00:00 2001
 From: slitaz-cn <teasiu@163.com>
 Date: Tue, 30 Mar 2021 15:30:30 +0800
-Subject: [PATCH 14/14] open ftp21 point
+Subject: [PATCH 14/15] open ftp21 point
 
 Signed-off-by: slitaz-cn <teasiu@163.com>
 ---

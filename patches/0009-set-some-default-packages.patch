@@ -1,7 +1,7 @@
 From 95a0d368e284c5d3956b9a0f9c965575576b9617 Mon Sep 17 00:00:00 2001
 From: slitaz-cn <teasiu@163.com>
 Date: Tue, 30 Mar 2021 12:02:03 +0800
-Subject: [PATCH 09/13] set some default packages
+Subject: [PATCH 09/15] set some default packages
 
 Signed-off-by: slitaz-cn <teasiu@163.com>
 ---

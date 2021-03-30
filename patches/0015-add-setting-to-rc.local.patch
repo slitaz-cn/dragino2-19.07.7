@@ -1,0 +1,35 @@
+From 35ce2e5b933c5bd5a9b4bc3bab0017bef5c50a73 Mon Sep 17 00:00:00 2001
+From: slitaz-cn <teasiu@163.com>
+Date: Tue, 30 Mar 2021 21:25:41 +0800
+Subject: [PATCH 15/15] add setting to rc.local
+
+Signed-off-by: slitaz-cn <teasiu@163.com>
+---
+ package/base-files/files/etc/rc.local | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/package/base-files/files/etc/rc.local b/package/base-files/files/etc/rc.local
+index 56394773c3..3a29610203 100644
+--- a/package/base-files/files/etc/rc.local
++++ b/package/base-files/files/etc/rc.local
+@@ -1,4 +1,16 @@
+ # Put your custom commands here that should be executed once
+ # the system init finished. By default this file does nothing.
+-
++#dd if=/dev/zero of=iscsi.img count=0 obs=1 seek=50G
++#tgtadm --lld iscsi --op new --mode logicalunit --tid 3 --lun 1 -b /mnt/sda1/iscsi-windows.img
++#tgtadm --lld iscsi --op show --mode target
++#sed -i 's_downloads.openwrt.org_mirrors.ustc.edu.cn/openwrt_' /etc/opkg/distfeeds.conf
++#echo "#0 4 * * * reboot" > /etc/crontabs/root
++if [ -f /mnt/sda1/router/settings.sh ]; then
++	echo "配置新的settings脚本中"
++	cp -a /mnt/sda1/router/settings.sh /etc/
++	chmod +x /etc/settings.sh > /dev/null
++	bash /etc/settings.sh
++else
++	echo "磁盘未挂载或者新的配置文件不存在"
++fi
+ exit 0
+-- 
+2.25.1
+

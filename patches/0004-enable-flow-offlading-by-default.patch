@@ -1,0 +1,25 @@
+From 3bf50ea2b8f298a3b606bcd2b0ccf4e8341460bf Mon Sep 17 00:00:00 2001
+From: slitaz-cn <teasiu@163.com>
+Date: Tue, 30 Mar 2021 11:58:05 +0800
+Subject: [PATCH 04/15] enable flow offlading by default
+
+Signed-off-by: slitaz-cn <teasiu@163.com>
+---
+ package/network/config/firewall/files/firewall.config | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/package/network/config/firewall/files/firewall.config b/package/network/config/firewall/files/firewall.config
+index 8874e9882c..8d58e62596 100644
+--- a/package/network/config/firewall/files/firewall.config
++++ b/package/network/config/firewall/files/firewall.config
+@@ -3,6 +3,7 @@ config defaults
+ 	option input		ACCEPT
+ 	option output		ACCEPT
+ 	option forward		REJECT
++	option flow_offloading	1
+ # Uncomment this line to disable ipv6 rules
+ #	option disable_ipv6	1
+ 
+-- 
+2.25.1
+

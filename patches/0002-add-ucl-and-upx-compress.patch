@@ -1,7 +1,7 @@
 From 8d368f16d1b809de35847a3be15d3df69189a39a Mon Sep 17 00:00:00 2001
 From: slitaz-cn <teasiu@163.com>
 Date: Tue, 30 Mar 2021 11:55:27 +0800
-Subject: [PATCH 02/13] add ucl and upx compress
+Subject: [PATCH 02/15] add ucl and upx compress
 
 Signed-off-by: slitaz-cn <teasiu@163.com>
 ---

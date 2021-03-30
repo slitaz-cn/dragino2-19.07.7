@@ -1,7 +1,7 @@
 From 2439baee86b97d19a8cc6e8417b7164435b8aafb Mon Sep 17 00:00:00 2001
 From: slitaz-cn <teasiu@163.com>
 Date: Tue, 30 Mar 2021 11:52:45 +0800
-Subject: [PATCH 01/13] change IP to 192.168.33.1 for default
+Subject: [PATCH 01/15] change IP to 192.168.33.1 for default
 
 Signed-off-by: slitaz-cn <teasiu@163.com>
 ---
