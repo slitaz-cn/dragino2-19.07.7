@@ -113,3 +113,4 @@ make -j$(($(nproc) + 1)) || make -j1 V=s
 # copy output files
 cd "$proj_dir"
 cp -a openwrt/bin/targets/*/* artifact
+rm -rf artifact/packages
