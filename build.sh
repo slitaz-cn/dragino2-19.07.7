@@ -55,7 +55,7 @@ svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/ipt2socks custom/
 svn co https://github.com/fw876/helloworld/trunk/naiveproxy custom/naiveproxy
 svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/redsocks2 custom/redsocks2
 # luci-app-openclash
-svn co https://github.com/vernesong/OpenClash/trunk/luci-app-openclash custom/luci-app-openclash
+#svn co https://github.com/vernesong/OpenClash/trunk/luci-app-openclash custom/luci-app-openclash
 # luci-app-filebrowser
 
 # luci-app-arpbind
