@@ -45,6 +45,7 @@ svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/pdnsd-alt custom/
 svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/microsocks custom/microsocks
 svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/dns2socks custom/dns2socks
 svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/simple-obfs custom/simple-obfs
+svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/kcptun custom/kcptun
 svn co https://github.com/fw876/helloworld/trunk/tcping custom/tcping
 svn co https://github.com/fw876/helloworld/trunk/xray-core custom/xray-core
 svn co https://github.com/fw876/helloworld/trunk/shadowsocks-rust custom/shadowsocks-rust

@@ -5,16 +5,10 @@ CONFIG_TARGET_ar71xx_generic=y
 CONFIG_TARGET_ar71xx_generic_DEVICE_dragino2=y
 
 CONFIG_LUCI_LANG_zh_Hans=y
-
-CONFIG_PACKAGE_kmod-fs-antfs=y
 CONFIG_PACKAGE_kmod-fs-vfat=y
-CONFIG_PACKAGE_kmod-tcp-bbr=y
-CONFIG_PACKAGE_kmod-tun=y
 CONFIG_PACKAGE_kmod-usb-storage=y
 
 CONFIG_PACKAGE_block-mount=y
-CONFIG_PACKAGE_coremark=y
-CONFIG_PACKAGE_coreutils-nohup=y
 CONFIG_PACKAGE_curl=y
 CONFIG_PACKAGE_fdisk=y
 CONFIG_PACKAGE_gzip=y
