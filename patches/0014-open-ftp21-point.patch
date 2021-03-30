@@ -1,0 +1,31 @@
+From 820d804b681f2ed78c8ff0f808eb8168ef007754 Mon Sep 17 00:00:00 2001
+From: slitaz-cn <teasiu@163.com>
+Date: Tue, 30 Mar 2021 15:30:30 +0800
+Subject: [PATCH 14/14] open ftp21 point
+
+Signed-off-by: slitaz-cn <teasiu@163.com>
+---
+ package/network/config/firewall/files/firewall.config | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/package/network/config/firewall/files/firewall.config b/package/network/config/firewall/files/firewall.config
+index 937cf8b1cf..c113f1fc25 100644
+--- a/package/network/config/firewall/files/firewall.config
++++ b/package/network/config/firewall/files/firewall.config
+@@ -151,6 +151,13 @@ config rule
+ 	option target		ACCEPT
+ 	option src		wan
+ 
++config rule
++	option name		ftp21
++	option proto		tcp
++	option dest_port	21
++	option target		ACCEPT
++	option src		wan
++	
+ config redirect
+ 	option target		DNAT
+ 	option name		ssh
+-- 
+2.25.1
+
