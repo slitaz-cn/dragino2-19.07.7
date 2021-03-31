@@ -1,0 +1,99 @@
+From a26cdfa54e7ad8aed7c06af877648118830104c4 Mon Sep 17 00:00:00 2001
+From: slitaz-cn <teasiu@163.com>
+Date: Wed, 31 Mar 2021 12:30:56 +0800
+Subject: [PATCH] set default dragino2
+
+Signed-off-by: slitaz-cn <teasiu@163.com>
+---
+ lang/php7/files/php.ini                      |  6 +++---
+ net/nginx/files-luci-support/luci_nginx.conf | 18 +++++++++++++++---
+ net/transmission-web-control/Makefile        |  6 +++---
+ 3 files changed, 21 insertions(+), 9 deletions(-)
+ mode change 100644 => 100755 net/nginx/files-luci-support/luci_nginx.conf
+
+diff --git a/lang/php7/files/php.ini b/lang/php7/files/php.ini
+index c88ab0a44..1cce06ccb 100644
+--- a/lang/php7/files/php.ini
++++ b/lang/php7/files/php.ini
+@@ -4,7 +4,7 @@ zend.ze1_compatibility_mode = Off
+ ; Language Options
+ 
+ engine = On
+-;short_open_tag = Off
++short_open_tag = On
+ precision    =  12
+ y2k_compliance = On
+ output_buffering = Off
+@@ -116,14 +116,14 @@ magic_quotes_sybase = Off
+ auto_prepend_file =
+ auto_append_file =
+ default_mimetype = "text/html"
+-;default_charset = "iso-8859-1"
++default_charset = "utf-8"
+ ;always_populate_raw_post_data = On
+ 
+ ; Paths and Directories
+ 
+ ; UNIX: "/path1:/path2"
+ ;include_path = ".:/php/includes"
+-doc_root = "/www"
++;doc_root = "/www"
+ user_dir =
+ extension_dir = "/usr/lib/php"
+ enable_dl = On
+diff --git a/net/nginx/files-luci-support/luci_nginx.conf b/net/nginx/files-luci-support/luci_nginx.conf
+old mode 100644
+new mode 100755
+index 75f0f78a6..9f84fab44
+--- a/net/nginx/files-luci-support/luci_nginx.conf
++++ b/net/nginx/files-luci-support/luci_nginx.conf
+@@ -36,14 +36,26 @@ http {
+     root /www;
+ 
+     server {
+-        listen 80 default_server;
+-        listen [::]:80 default_server;
++        listen 8083 default_server;
++        listen [::]:8083 default_server;
+         server_name  localhost;
+ 
+         location ~* .(jpg|jpeg|png|gif|ico|css|js)$ {
+             expires 365d;
+         }
+-
++        location /www/dl/slitaz/iso/rolling/ {
++		autoindex on;
++		autoindex_exact_size off;
++		autoindex_localtime on;
++		charset utf-8,gbk;
++        }
++	location ~ \.php$ {
++            root           /www;
++            fastcgi_pass   127.0.0.1:1026; 
++            fastcgi_index  index.php;
++            fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
++            include        fastcgi_params;
++	}  
+         include luci_uwsgi.conf;
+ 
+     }
+diff --git a/net/transmission-web-control/Makefile b/net/transmission-web-control/Makefile
+index 7547dbde2..ab9457b8c 100644
+--- a/net/transmission-web-control/Makefile
++++ b/net/transmission-web-control/Makefile
+@@ -5,9 +5,9 @@ PKG_RELEASE:=1
+ 
+ PKG_SOURCE_PROTO:=git
+ PKG_SOURCE_URL:=https://github.com/ronggang/transmission-web-control
+-PKG_SOURCE_DATE:=2019-04-16
+-PKG_SOURCE_VERSION:=a747a87babb246b0d3e6dd108ad7b4c19462cfe6
+-PKG_MIRROR_HASH:=90a2e33bd799a13504881e26980823fa181b47918900fc4ef03ae3daf0625f14
++PKG_SOURCE_DATE:=2020-09-13
++PKG_SOURCE_VERSION:=c26a0761e3a8fe3cff2480735ec363dc253c5105
++PKG_MIRROR_HASH:=skip
+ 
+ PKG_LICENSE:=MIT
+ PKG_LICENSE_FILES:=LICENSE
+-- 
+2.25.1
+

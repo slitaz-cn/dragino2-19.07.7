@@ -17,7 +17,6 @@ git clone -b v19.07.7 https://github.com/openwrt/openwrt.git openwrt
 # patch openwrt
 cd "$proj_dir/openwrt"
 cat "$proj_dir/patches"/*.patch | patch -p1
-wget -qO- https://patch-diff.githubusercontent.com/raw/openwrt/openwrt/pull/3940.patch | patch -p1
 
 # obtain feed list
 cd "$proj_dir/openwrt"
@@ -39,27 +38,17 @@ done
 # addition packages
 cd "$proj_dir/openwrt/package"
 # luci-app-helloworld
-svn co https://github.com/fw876/helloworld/trunk/luci-app-ssr-plus custom/luci-app-ssr-plus
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/shadowsocksr-libev custom/shadowsocksr-libev
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/pdnsd-alt custom/pdnsd-alt
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/microsocks custom/microsocks
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/dns2socks custom/dns2socks
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/simple-obfs custom/simple-obfs
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/kcptun custom/kcptun
-svn co https://github.com/fw876/helloworld/trunk/tcping custom/tcping
-svn co https://github.com/fw876/helloworld/trunk/xray-core custom/xray-core
-svn co https://github.com/fw876/helloworld/trunk/shadowsocks-rust custom/shadowsocks-rust
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/v2ray-plugin custom/v2ray-plugin
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/trojan custom/trojan
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/ipt2socks custom/ipt2socks
-svn co https://github.com/fw876/helloworld/trunk/naiveproxy custom/naiveproxy
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/redsocks2 custom/redsocks2
+svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/vlmcsd custom/vlmcsd
+svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/luci-app-vlmcsd custom/luci-app-vlmcsd
+svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/luci-app-ramfree custom/luci-app-ramfree
+svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/luci-app-nfs custom/luci-app-nfs
+svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/wol custom/wol
 # luci-app-openclash
 #svn co https://github.com/vernesong/OpenClash/trunk/luci-app-openclash custom/luci-app-openclash
 # luci-app-filebrowser
 
 # luci-app-arpbind
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/luci-app-arpbind custom/luci-app-arpbind
+#svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/luci-app-arpbind custom/luci-app-arpbind
 # luci-app-xlnetacc
 
 # luci-app-oled
@@ -81,9 +70,9 @@ git clone -b master --depth 1 https://github.com/jerrykuku/luci-theme-argon.git 
 #svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/luci-app-uugamebooster custom/luci-app-uugamebooster
 #svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/uugamebooster custom/uugamebooster
 # luci-app-admconf
-svn co https://github.com/teasiu/lede-other-apps/trunk/luci-app-admconf custom/luci-app-admconf
-svn co https://github.com/teasiu/lede-other-apps/trunk/luci-app-autoupdate custom/luci-app-autoupdate
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/wol custom/wol
+#svn co https://github.com/teasiu/lede-other-apps/trunk/luci-app-admconf custom/luci-app-admconf
+#svn co https://github.com/teasiu/lede-other-apps/trunk/luci-app-autoupdate custom/luci-app-autoupdate
+
 # clean up packages
 cd "$proj_dir/openwrt/package"
 find . -name .svn -exec rm -rf {} +
@@ -103,7 +92,7 @@ cd "$proj_dir/openwrt"
 
 # customize configs
 cd "$proj_dir/openwrt"
-cat "$proj_dir/dragino2.config" >.config
+cat "$proj_dir/dragino.config" >.config
 make defconfig
 
 # build openwrt

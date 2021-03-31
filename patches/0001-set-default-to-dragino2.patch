@@ -1,0 +1,1353 @@
+From 2ec2d6ed0977e32fc7cc568653c05eb073a770dc Mon Sep 17 00:00:00 2001
+From: slitaz-cn <teasiu@163.com>
+Date: Wed, 31 Mar 2021 12:15:35 +0800
+Subject: [PATCH] set default to dragino2
+
+Signed-off-by: slitaz-cn <teasiu@163.com>
+---
+ dragino2.config                               | 722 ++++++++++++++++++
+ include/target.mk                             |   4 +-
+ include/version.mk                            |   2 +-
+ package/base-files/Makefile                   |   4 +-
+ package/base-files/files/bin/config_generate  |  15 +-
+ package/base-files/files/etc/banner           |   2 +-
+ .../files/etc/nginx/conf.d/vhost.conf         |  13 +
+ package/base-files/files/etc/passwd           |   2 +-
+ package/base-files/files/etc/rc.local         |  14 +-
+ package/base-files/files/etc/shadow           |   2 +-
+ package/base-files/files/usr/libexec/login.sh |   2 +-
+ package/base-files/image-config.in            |   6 +-
+ .../linux/files/sysctl-nf-conntrack.conf      |   2 +-
+ .../config/firewall/files/firewall.config     |  38 +
+ .../services/dropbear/files/dropbear.config   |   1 +
+ .../services/samba36/files/samba.config       |   4 +-
+ .../services/uhttpd/files/uhttpd.config       |  17 +-
+ package/system/fstools/Makefile               |   1 +
+ package/system/fstools/files/10-auto-mount    |  85 +++
+ package/system/rpcd/files/rpcd.config         |   4 +-
+ scripts/download.pl                           |   1 +
+ tools/Makefile                                |   3 +-
+ tools/ucl/Makefile                            |  51 ++
+ tools/upx/Makefile                            |  35 +
+ 24 files changed, 1001 insertions(+), 29 deletions(-)
+ create mode 100755 dragino2.config
+ create mode 100755 package/base-files/files/etc/nginx/conf.d/vhost.conf
+ create mode 100644 package/system/fstools/files/10-auto-mount
+ create mode 100644 tools/ucl/Makefile
+ create mode 100644 tools/upx/Makefile
+
+diff --git a/dragino2.config b/dragino2.config
+new file mode 100755
+index 0000000000..950ed17d80
+--- /dev/null
++++ b/dragino2.config
+@@ -0,0 +1,722 @@
++CONFIG_MODULES=y
++CONFIG_HAVE_DOT_CONFIG=y
++CONFIG_TARGET_ar71xx=y
++CONFIG_TARGET_ar71xx_generic=y
++CONFIG_TARGET_ar71xx_generic_DEVICE_dragino2=y
++CONFIG_HAS_SUBTARGETS=y
++CONFIG_HAS_DEVICES=y
++CONFIG_TARGET_BOARD="ar71xx"
++CONFIG_TARGET_SUBTARGET="generic"
++CONFIG_TARGET_PROFILE="DEVICE_dragino2"
++CONFIG_TARGET_ARCH_PACKAGES="mips_24kc"
++CONFIG_DEFAULT_TARGET_OPTIMIZATION="-Os -pipe -mno-branch-likely -mips32r2 -mtune=24kc"
++CONFIG_CPU_TYPE="24kc"
++CONFIG_LINUX_4_14=y
++CONFIG_DEFAULT_base-files=y
++CONFIG_DEFAULT_busybox=y
++CONFIG_DEFAULT_dnsmasq=y
++CONFIG_DEFAULT_dropbear=y
++CONFIG_DEFAULT_firewall=y
++CONFIG_DEFAULT_fstools=y
++CONFIG_DEFAULT_ip6tables=y
++CONFIG_DEFAULT_iptables=y
++CONFIG_DEFAULT_iwinfo=y
++CONFIG_DEFAULT_kmod-ath9k=y
++CONFIG_DEFAULT_kmod-gpio-button-hotplug=y
++CONFIG_DEFAULT_kmod-ipt-offload=y
++CONFIG_DEFAULT_kmod-usb-core=y
++CONFIG_DEFAULT_kmod-usb-ledtrig-usbport=y
++CONFIG_DEFAULT_kmod-usb2=y
++CONFIG_DEFAULT_libc=y
++CONFIG_DEFAULT_libgcc=y
++CONFIG_DEFAULT_logd=y
++CONFIG_DEFAULT_mtd=y
++CONFIG_DEFAULT_netifd=y
++CONFIG_DEFAULT_odhcp6c=y
++CONFIG_DEFAULT_odhcpd-ipv6only=y
++CONFIG_DEFAULT_opkg=y
++CONFIG_DEFAULT_ppp=y
++CONFIG_DEFAULT_ppp-mod-pppoe=y
++CONFIG_DEFAULT_swconfig=y
++CONFIG_DEFAULT_uboot-envtools=y
++CONFIG_DEFAULT_uci=y
++CONFIG_DEFAULT_uclient-fetch=y
++CONFIG_DEFAULT_urandom-seed=y
++CONFIG_DEFAULT_urngd=y
++CONFIG_DEFAULT_wpad-basic=y
++CONFIG_AUDIO_SUPPORT=y
++CONFIG_GPIO_SUPPORT=y
++CONFIG_PCI_SUPPORT=y
++CONFIG_USB_SUPPORT=y
++CONFIG_USB_GADGET_SUPPORT=y
++CONFIG_BIG_ENDIAN=y
++CONFIG_USES_SQUASHFS=y
++CONFIG_HAS_MIPS16=y
++CONFIG_mips=y
++CONFIG_ARCH="mips"
++CONFIG_EXTERNAL_CPIO=""
++CONFIG_TARGET_ROOTFS_SQUASHFS=y
++CONFIG_TARGET_SQUASHFS_BLOCK_SIZE=256
++CONFIG_TARGET_UBIFS_FREE_SPACE_FIXUP=y
++CONFIG_TARGET_UBIFS_JOURNAL_SIZE=""
++CONFIG_SIGNED_PACKAGES=y
++CONFIG_SIGNATURE_CHECK=y
++CONFIG_SHADOW_PASSWORDS=y
++CONFIG_KERNEL_BUILD_USER=""
++CONFIG_KERNEL_BUILD_DOMAIN=""
++CONFIG_KERNEL_PRINTK=y
++CONFIG_KERNEL_CRASHLOG=y
++CONFIG_KERNEL_SWAP=y
++CONFIG_KERNEL_DEBUG_FS=y
++CONFIG_KERNEL_MIPS_FPU_EMULATOR=y
++CONFIG_KERNEL_KALLSYMS=y
++CONFIG_KERNEL_DEBUG_KERNEL=y
++CONFIG_KERNEL_DEBUG_INFO=y
++CONFIG_KERNEL_MAGIC_SYSRQ=y
++CONFIG_KERNEL_COREDUMP=y
++CONFIG_KERNEL_ELF_CORE=y
++CONFIG_KERNEL_PRINTK_TIME=y
++CONFIG_KERNEL_IP_MROUTE=y
++CONFIG_KERNEL_SQUASHFS_FRAGMENT_CACHE_SIZE=3
++CONFIG_KERNEL_CC_OPTIMIZE_FOR_PERFORMANCE=y
++CONFIG_USE_SSTRIP=y
++CONFIG_USE_UCLIBCXX=y
++CONFIG_PKG_CHECK_FORMAT_SECURITY=y
++CONFIG_PKG_CC_STACKPROTECTOR_REGULAR=y
++CONFIG_KERNEL_CC_STACKPROTECTOR_REGULAR=y
++CONFIG_KERNEL_STACKPROTECTOR=y
++CONFIG_PKG_FORTIFY_SOURCE_1=y
++CONFIG_PKG_RELRO_FULL=y
++CONFIG_BINARY_FOLDER=""
++CONFIG_DOWNLOAD_FOLDER=""
++CONFIG_LOCALMIRROR=""
++CONFIG_AUTOREBUILD=y
++CONFIG_BUILD_SUFFIX=""
++CONFIG_TARGET_ROOTFS_DIR=""
++CONFIG_EXTERNAL_KERNEL_TREE=""
++CONFIG_KERNEL_GIT_CLONE_URI=""
++CONFIG_EXTRA_OPTIMIZATION="-fno-caller-saves -fno-plt"
++CONFIG_TARGET_OPTIMIZATION="-Os -pipe -mno-branch-likely -mips32r2 -mtune=24kc"
++CONFIG_SOFT_FLOAT=y
++CONFIG_USE_MIPS16=y
++CONFIG_EXTRA_BINUTILS_CONFIG_OPTIONS=""
++CONFIG_EXTRA_GCC_CONFIG_OPTIONS=""
++CONFIG_GDB=y
++CONFIG_USE_MUSL=y
++CONFIG_SSP_SUPPORT=y
++CONFIG_BINUTILS_VERSION_2_31_1=y
++CONFIG_BINUTILS_VERSION="2.31.1"
++CONFIG_GCC_VERSION="7.5.0"
++CONFIG_LIBC="musl"
++CONFIG_TARGET_SUFFIX="musl"
++CONFIG_TARGET_PREINIT_SUPPRESS_STDERR=y
++CONFIG_TARGET_PREINIT_TIMEOUT=2
++CONFIG_TARGET_PREINIT_IFNAME=""
++CONFIG_TARGET_PREINIT_IP="192.168.1.1"
++CONFIG_TARGET_PREINIT_NETMASK="255.255.255.0"
++CONFIG_TARGET_PREINIT_BROADCAST="192.168.1.255"
++CONFIG_TARGET_INIT_PATH="/usr/sbin:/usr/bin:/sbin:/bin"
++CONFIG_TARGET_INIT_ENV=""
++CONFIG_TARGET_INIT_CMD="/sbin/init"
++CONFIG_TARGET_INIT_SUPPRESS_STDERR=y
++CONFIG_PER_FEED_REPO=y
++CONFIG_FEED_packages=y
++CONFIG_FEED_luci=y
++CONFIG_FEED_routing=y
++CONFIG_FEED_telephony=y
++CONFIG_FEED_freifunk=y
++CONFIG_PACKAGE_base-files=y
++CONFIG_PACKAGE_block-mount=y
++CONFIG_PACKAGE_busybox=y
++CONFIG_BUSYBOX_DEFAULT_HAVE_DOT_CONFIG=y
++CONFIG_BUSYBOX_DEFAULT_INCLUDE_SUSv2=y
++CONFIG_BUSYBOX_DEFAULT_LONG_OPTS=y
++CONFIG_BUSYBOX_DEFAULT_SHOW_USAGE=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_VERBOSE_USAGE=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_COMPRESS_USAGE=y
++CONFIG_BUSYBOX_DEFAULT_LFS=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_DEVPTS=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_PIDFILE=y
++CONFIG_BUSYBOX_DEFAULT_PID_FILE_PATH="/var/run"
++CONFIG_BUSYBOX_DEFAULT_FEATURE_SUID=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_PREFER_APPLETS=y
++CONFIG_BUSYBOX_DEFAULT_BUSYBOX_EXEC_PATH="/proc/self/exe"
++CONFIG_BUSYBOX_DEFAULT_FEATURE_SYSLOG=y
++CONFIG_BUSYBOX_DEFAULT_PLATFORM_LINUX=y
++CONFIG_BUSYBOX_DEFAULT_CROSS_COMPILER_PREFIX=""
++CONFIG_BUSYBOX_DEFAULT_SYSROOT=""
++CONFIG_BUSYBOX_DEFAULT_EXTRA_CFLAGS=""
++CONFIG_BUSYBOX_DEFAULT_EXTRA_LDFLAGS=""
++CONFIG_BUSYBOX_DEFAULT_EXTRA_LDLIBS=""
++CONFIG_BUSYBOX_DEFAULT_INSTALL_APPLET_SYMLINKS=y
++CONFIG_BUSYBOX_DEFAULT_PREFIX="./_install"
++CONFIG_BUSYBOX_DEFAULT_NO_DEBUG_LIB=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_BUFFERS_GO_ON_STACK=y
++CONFIG_BUSYBOX_DEFAULT_PASSWORD_MINLEN=6
++CONFIG_BUSYBOX_DEFAULT_MD5_SMALL=1
++CONFIG_BUSYBOX_DEFAULT_SHA3_SMALL=1
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FAST_TOP=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_EDITING=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_EDITING_MAX_LEN=512
++CONFIG_BUSYBOX_DEFAULT_FEATURE_EDITING_HISTORY=256
++CONFIG_BUSYBOX_DEFAULT_FEATURE_TAB_COMPLETION=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_EDITING_FANCY_PROMPT=y
++CONFIG_BUSYBOX_DEFAULT_SUBST_WCHAR=0
++CONFIG_BUSYBOX_DEFAULT_LAST_SUPPORTED_WCHAR=0
++CONFIG_BUSYBOX_DEFAULT_FEATURE_NON_POSIX_CP=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_USE_SENDFILE=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_COPYBUF_KB=4
++CONFIG_BUSYBOX_DEFAULT_IOCTL_HEX2STR_ERROR=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_SEAMLESS_GZ=y
++CONFIG_BUSYBOX_DEFAULT_GUNZIP=y
++CONFIG_BUSYBOX_DEFAULT_ZCAT=y
++CONFIG_BUSYBOX_DEFAULT_BUNZIP2=y
++CONFIG_BUSYBOX_DEFAULT_BZCAT=y
++CONFIG_BUSYBOX_DEFAULT_BZIP2_SMALL=0
++CONFIG_BUSYBOX_DEFAULT_FEATURE_BZIP2_DECOMPRESS=y
++CONFIG_BUSYBOX_DEFAULT_GZIP=y
++CONFIG_BUSYBOX_DEFAULT_GZIP_FAST=0
++CONFIG_BUSYBOX_DEFAULT_FEATURE_GZIP_DECOMPRESS=y
++CONFIG_BUSYBOX_DEFAULT_TAR=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_TAR_CREATE=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_TAR_FROM=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_TAR_GNU_EXTENSIONS=y
++CONFIG_BUSYBOX_DEFAULT_BASENAME=y
++CONFIG_BUSYBOX_DEFAULT_CAT=y
++CONFIG_BUSYBOX_DEFAULT_CHGRP=y
++CONFIG_BUSYBOX_DEFAULT_CHMOD=y
++CONFIG_BUSYBOX_DEFAULT_CHOWN=y
++CONFIG_BUSYBOX_DEFAULT_CHROOT=y
++CONFIG_BUSYBOX_DEFAULT_CP=y
++CONFIG_BUSYBOX_DEFAULT_CUT=y
++CONFIG_BUSYBOX_DEFAULT_DATE=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_DATE_ISOFMT=y
++CONFIG_BUSYBOX_DEFAULT_DD=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_DD_SIGNAL_HANDLING=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_DD_IBS_OBS=y
++CONFIG_BUSYBOX_DEFAULT_DF=y
++CONFIG_BUSYBOX_DEFAULT_DIRNAME=y
++CONFIG_BUSYBOX_DEFAULT_DU=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_DU_DEFAULT_BLOCKSIZE_1K=y
++CONFIG_BUSYBOX_DEFAULT_ECHO=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FANCY_ECHO=y
++CONFIG_BUSYBOX_DEFAULT_ENV=y
++CONFIG_BUSYBOX_DEFAULT_EXPR=y
++CONFIG_BUSYBOX_DEFAULT_EXPR_MATH_SUPPORT_64=y
++CONFIG_BUSYBOX_DEFAULT_FALSE=y
++CONFIG_BUSYBOX_DEFAULT_FSYNC=y
++CONFIG_BUSYBOX_DEFAULT_HEAD=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FANCY_HEAD=y
++CONFIG_BUSYBOX_DEFAULT_ID=y
++CONFIG_BUSYBOX_DEFAULT_LN=y
++CONFIG_BUSYBOX_DEFAULT_LS=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_LS_FILETYPES=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_LS_FOLLOWLINKS=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_LS_RECURSIVE=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_LS_WIDTH=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_LS_SORTFILES=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_LS_TIMESTAMPS=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_LS_USERNAME=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_LS_COLOR=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_LS_COLOR_IS_DEFAULT=y
++CONFIG_BUSYBOX_DEFAULT_MD5SUM=y
++CONFIG_BUSYBOX_DEFAULT_SHA256SUM=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_MD5_SHA1_SUM_CHECK=y
++CONFIG_BUSYBOX_DEFAULT_MKDIR=y
++CONFIG_BUSYBOX_DEFAULT_MKFIFO=y
++CONFIG_BUSYBOX_DEFAULT_MKNOD=y
++CONFIG_BUSYBOX_DEFAULT_MKTEMP=y
++CONFIG_BUSYBOX_DEFAULT_MV=y
++CONFIG_BUSYBOX_DEFAULT_NICE=y
++CONFIG_BUSYBOX_DEFAULT_PRINTF=y
++CONFIG_BUSYBOX_DEFAULT_PWD=y
++CONFIG_BUSYBOX_DEFAULT_READLINK=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_READLINK_FOLLOW=y
++CONFIG_BUSYBOX_DEFAULT_RM=y
++CONFIG_BUSYBOX_DEFAULT_RMDIR=y
++CONFIG_BUSYBOX_DEFAULT_SEQ=y
++CONFIG_BUSYBOX_DEFAULT_SLEEP=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FANCY_SLEEP=y
++CONFIG_BUSYBOX_DEFAULT_SORT=y
++CONFIG_BUSYBOX_DEFAULT_SYNC=y
++CONFIG_BUSYBOX_DEFAULT_TAIL=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FANCY_TAIL=y
++CONFIG_BUSYBOX_DEFAULT_TEE=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_TEE_USE_BLOCK_IO=y
++CONFIG_BUSYBOX_DEFAULT_TEST=y
++CONFIG_BUSYBOX_DEFAULT_TEST1=y
++CONFIG_BUSYBOX_DEFAULT_TEST2=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_TEST_64=y
++CONFIG_BUSYBOX_DEFAULT_TOUCH=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_TOUCH_SUSV3=y
++CONFIG_BUSYBOX_DEFAULT_TR=y
++CONFIG_BUSYBOX_DEFAULT_TRUE=y
++CONFIG_BUSYBOX_DEFAULT_UNAME=y
++CONFIG_BUSYBOX_DEFAULT_UNAME_OSNAME="GNU/Linux"
++CONFIG_BUSYBOX_DEFAULT_UNIQ=y
++CONFIG_BUSYBOX_DEFAULT_WC=y
++CONFIG_BUSYBOX_DEFAULT_YES=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_PRESERVE_HARDLINKS=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_HUMAN_READABLE=y
++CONFIG_BUSYBOX_DEFAULT_CLEAR=y
++CONFIG_BUSYBOX_DEFAULT_DEFAULT_SETFONT_DIR=""
++CONFIG_BUSYBOX_DEFAULT_RESET=y
++CONFIG_BUSYBOX_DEFAULT_START_STOP_DAEMON=y
++CONFIG_BUSYBOX_DEFAULT_WHICH=y
++CONFIG_BUSYBOX_DEFAULT_AWK=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_AWK_LIBM=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_AWK_GNU_EXTENSIONS=y
++CONFIG_BUSYBOX_DEFAULT_CMP=y
++CONFIG_BUSYBOX_DEFAULT_SED=y
++CONFIG_BUSYBOX_DEFAULT_VI=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_VI_MAX_LEN=1024
++CONFIG_BUSYBOX_DEFAULT_FEATURE_VI_COLON=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_VI_YANKMARK=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_VI_SEARCH=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_VI_USE_SIGNALS=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_VI_DOT_CMD=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_VI_READONLY=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_VI_SETOPTS=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_VI_SET=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_VI_WIN_RESIZE=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_VI_ASK_TERMINAL=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_VI_UNDO_QUEUE_MAX=0
++CONFIG_BUSYBOX_DEFAULT_FEATURE_ALLOW_EXEC=y
++CONFIG_BUSYBOX_DEFAULT_FIND=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FIND_PRINT0=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FIND_MTIME=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FIND_PERM=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FIND_TYPE=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FIND_XDEV=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FIND_MAXDEPTH=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FIND_NEWER=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FIND_EXEC=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FIND_USER=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FIND_GROUP=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FIND_NOT=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FIND_DEPTH=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FIND_PAREN=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FIND_SIZE=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FIND_PRUNE=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FIND_PATH=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FIND_REGEX=y
++CONFIG_BUSYBOX_DEFAULT_GREP=y
++CONFIG_BUSYBOX_DEFAULT_EGREP=y
++CONFIG_BUSYBOX_DEFAULT_FGREP=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_GREP_CONTEXT=y
++CONFIG_BUSYBOX_DEFAULT_XARGS=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_XARGS_SUPPORT_CONFIRMATION=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_XARGS_SUPPORT_QUOTES=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_XARGS_SUPPORT_TERMOPT=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_XARGS_SUPPORT_ZERO_TERM=y
++CONFIG_BUSYBOX_DEFAULT_HALT=y
++CONFIG_BUSYBOX_DEFAULT_POWEROFF=y
++CONFIG_BUSYBOX_DEFAULT_REBOOT=y
++CONFIG_BUSYBOX_DEFAULT_TELINIT_PATH=""
++CONFIG_BUSYBOX_DEFAULT_FEATURE_KILL_DELAY=0
++CONFIG_BUSYBOX_DEFAULT_INIT_TERMINAL_TYPE=""
++CONFIG_BUSYBOX_DEFAULT_FEATURE_SHADOWPASSWDS=y
++CONFIG_BUSYBOX_DEFAULT_LAST_ID=0
++CONFIG_BUSYBOX_DEFAULT_FIRST_SYSTEM_ID=0
++CONFIG_BUSYBOX_DEFAULT_LAST_SYSTEM_ID=0
++CONFIG_BUSYBOX_DEFAULT_FEATURE_DEFAULT_PASSWD_ALGO="md5"
++CONFIG_BUSYBOX_DEFAULT_LOGIN=y
++CONFIG_BUSYBOX_DEFAULT_LOGIN_SESSION_AS_CHILD=y
++CONFIG_BUSYBOX_DEFAULT_PASSWD=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_PASSWD_WEAK_CHECK=y
++CONFIG_BUSYBOX_DEFAULT_DEFAULT_MODULES_DIR=""
++CONFIG_BUSYBOX_DEFAULT_DEFAULT_DEPMOD_FILE=""
++CONFIG_BUSYBOX_DEFAULT_DMESG=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_DMESG_PRETTY=y
++CONFIG_BUSYBOX_DEFAULT_FLOCK=y
++CONFIG_BUSYBOX_DEFAULT_HEXDUMP=y
++CONFIG_BUSYBOX_DEFAULT_HWCLOCK=y
++CONFIG_BUSYBOX_DEFAULT_MKSWAP=y
++CONFIG_BUSYBOX_DEFAULT_MOUNT=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_MOUNT_HELPERS=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_MOUNT_CIFS=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_MOUNT_FLAGS=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_MOUNT_FSTAB=y
++CONFIG_BUSYBOX_DEFAULT_PIVOT_ROOT=y
++CONFIG_BUSYBOX_DEFAULT_SWAPON=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_SWAPON_DISCARD=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_SWAPON_PRI=y
++CONFIG_BUSYBOX_DEFAULT_SWAPOFF=y
++CONFIG_BUSYBOX_DEFAULT_SWITCH_ROOT=y
++CONFIG_BUSYBOX_DEFAULT_UMOUNT=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_UMOUNT_ALL=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_MOUNT_LOOP=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_BEEP_FREQ=0
++CONFIG_BUSYBOX_DEFAULT_FEATURE_BEEP_LENGTH_MS=0
++CONFIG_BUSYBOX_DEFAULT_CROND=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_CROND_DIR="/etc"
++CONFIG_BUSYBOX_DEFAULT_CRONTAB=y
++CONFIG_BUSYBOX_DEFAULT_LESS=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_LESS_MAXLINES=9999999
++CONFIG_BUSYBOX_DEFAULT_LOCK=y
++CONFIG_BUSYBOX_DEFAULT_STRINGS=y
++CONFIG_BUSYBOX_DEFAULT_TIME=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_PREFER_IPV4_ADDRESS=y
++CONFIG_BUSYBOX_DEFAULT_VERBOSE_RESOLUTION_ERRORS=y
++CONFIG_BUSYBOX_DEFAULT_BRCTL=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_BRCTL_FANCY=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_BRCTL_SHOW=y
++CONFIG_BUSYBOX_DEFAULT_IFCONFIG=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_IFCONFIG_STATUS=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_IFCONFIG_HW=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_IFCONFIG_BROADCAST_PLUS=y
++CONFIG_BUSYBOX_DEFAULT_IFUPDOWN_IFSTATE_PATH=""
++CONFIG_BUSYBOX_DEFAULT_IP=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_IP_ADDRESS=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_IP_LINK=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_IP_ROUTE=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_IP_ROUTE_DIR="/etc/iproute2"
++CONFIG_BUSYBOX_DEFAULT_FEATURE_IP_RULE=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_IP_NEIGH=y
++CONFIG_BUSYBOX_DEFAULT_NC=y
++CONFIG_BUSYBOX_DEFAULT_NETMSG=y
++CONFIG_BUSYBOX_DEFAULT_NETSTAT=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_NETSTAT_WIDE=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_NETSTAT_PRG=y
++CONFIG_BUSYBOX_DEFAULT_NSLOOKUP_OPENWRT=y
++CONFIG_BUSYBOX_DEFAULT_NTPD=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_NTPD_SERVER=y
++CONFIG_BUSYBOX_DEFAULT_PING=y
++CONFIG_BUSYBOX_DEFAULT_PING6=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_FANCY_PING=y
++CONFIG_BUSYBOX_DEFAULT_ROUTE=y
++CONFIG_BUSYBOX_DEFAULT_TRACEROUTE=y
++CONFIG_BUSYBOX_DEFAULT_TRACEROUTE6=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_TRACEROUTE_VERBOSE=y
++CONFIG_BUSYBOX_DEFAULT_DHCPD_LEASES_FILE=""
++CONFIG_BUSYBOX_DEFAULT_UDHCPC=y
++CONFIG_BUSYBOX_DEFAULT_UDHCPC_DEFAULT_SCRIPT="/usr/share/udhcpc/default.script"
++CONFIG_BUSYBOX_DEFAULT_UDHCP_DEBUG=0
++CONFIG_BUSYBOX_DEFAULT_UDHCPC_SLACK_FOR_BUGGY_SERVERS=80
++CONFIG_BUSYBOX_DEFAULT_FEATURE_UDHCP_RFC3397=y
++CONFIG_BUSYBOX_DEFAULT_IFUPDOWN_UDHCPC_CMD_OPTIONS=""
++CONFIG_BUSYBOX_DEFAULT_FEATURE_MIME_CHARSET=""
++CONFIG_BUSYBOX_DEFAULT_FREE=y
++CONFIG_BUSYBOX_DEFAULT_KILL=y
++CONFIG_BUSYBOX_DEFAULT_KILLALL=y
++CONFIG_BUSYBOX_DEFAULT_PGREP=y
++CONFIG_BUSYBOX_DEFAULT_PIDOF=y
++CONFIG_BUSYBOX_DEFAULT_PS=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_PS_WIDE=y
++CONFIG_BUSYBOX_DEFAULT_BB_SYSCTL=y
++CONFIG_BUSYBOX_DEFAULT_TOP=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_TOP_CPU_USAGE_PERCENTAGE=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_TOP_CPU_GLOBAL_PERCENTS=y
++CONFIG_BUSYBOX_DEFAULT_UPTIME=y
++CONFIG_BUSYBOX_DEFAULT_SV_DEFAULT_SERVICE_DIR=""
++CONFIG_BUSYBOX_DEFAULT_SH_IS_ASH=y
++CONFIG_BUSYBOX_DEFAULT_BASH_IS_NONE=y
++CONFIG_BUSYBOX_DEFAULT_ASH=y
++CONFIG_BUSYBOX_DEFAULT_ASH_INTERNAL_GLOB=y
++CONFIG_BUSYBOX_DEFAULT_ASH_BASH_COMPAT=y
++CONFIG_BUSYBOX_DEFAULT_ASH_JOB_CONTROL=y
++CONFIG_BUSYBOX_DEFAULT_ASH_ALIAS=y
++CONFIG_BUSYBOX_DEFAULT_ASH_EXPAND_PRMT=y
++CONFIG_BUSYBOX_DEFAULT_ASH_ECHO=y
++CONFIG_BUSYBOX_DEFAULT_ASH_PRINTF=y
++CONFIG_BUSYBOX_DEFAULT_ASH_TEST=y
++CONFIG_BUSYBOX_DEFAULT_ASH_GETOPTS=y
++CONFIG_BUSYBOX_DEFAULT_ASH_CMDCMD=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_SH_MATH=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_SH_MATH_64=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_SH_NOFORK=y
++CONFIG_BUSYBOX_DEFAULT_LOGGER=y
++CONFIG_BUSYBOX_DEFAULT_FEATURE_SYSLOGD_READ_BUFFER_SIZE=0
++CONFIG_BUSYBOX_DEFAULT_FEATURE_IPC_SYSLOG_BUFFER_SIZE=0
++CONFIG_PACKAGE_ca-bundle=y
++CONFIG_PACKAGE_ca-certificates=y
++CONFIG_PACKAGE_dnsmasq=y
++CONFIG_PACKAGE_dropbear=y
++CONFIG_DROPBEAR_CURVE25519=y
++CONFIG_DROPBEAR_DBCLIENT=y
++CONFIG_PACKAGE_firewall=y
++CONFIG_PACKAGE_fstools=y
++CONFIG_PACKAGE_fwtool=y
++CONFIG_PACKAGE_getrandom=y
++CONFIG_PACKAGE_jsonfilter=y
++CONFIG_PACKAGE_libatomic=y
++CONFIG_PACKAGE_libc=y
++CONFIG_PACKAGE_libgcc=y
++CONFIG_PACKAGE_libpthread=y
++CONFIG_PACKAGE_librt=y
++CONFIG_PACKAGE_libstdcpp=y
++CONFIG_PACKAGE_logd=y
++CONFIG_PACKAGE_mtd=y
++CONFIG_PACKAGE_netifd=y
++CONFIG_PACKAGE_openwrt-keyring=y
++CONFIG_PACKAGE_opkg=y
++CONFIG_PACKAGE_procd=y
++CONFIG_PACKAGE_rpcd=y
++CONFIG_PACKAGE_rpcd-mod-file=y
++CONFIG_PACKAGE_rpcd-mod-iwinfo=y
++CONFIG_PACKAGE_swconfig=y
++CONFIG_PACKAGE_ubox=y
++CONFIG_PACKAGE_ubus=y
++CONFIG_PACKAGE_ubusd=y
++CONFIG_PACKAGE_uci=y
++CONFIG_PACKAGE_urandom-seed=y
++CONFIG_PACKAGE_urngd=y
++CONFIG_PACKAGE_usign=y
++CONFIG_ZABBIX_NOSSL=y
++CONFIG_ZABBIX_POSTGRESQL=y
++CONFIG_PACKAGE_wireless-regdb=y
++CONFIG_PACKAGE_kmod-scsi-core=y
++CONFIG_PACKAGE_kmod-crypto-crc32c=y
++CONFIG_PACKAGE_kmod-crypto-hash=y
++CONFIG_PACKAGE_kmod-fs-ext4=y
++CONFIG_PACKAGE_kmod-lib-crc-ccitt=y
++CONFIG_PACKAGE_kmod-lib-crc16=y
++CONFIG_PACKAGE_kmod-nls-base=y
++CONFIG_PACKAGE_kmod-ipt-conntrack=y
++CONFIG_PACKAGE_kmod-ipt-core=y
++CONFIG_PACKAGE_kmod-ipt-nat=y
++CONFIG_PACKAGE_kmod-ipt-offload=y
++CONFIG_PACKAGE_kmod-nf-conntrack=y
++CONFIG_PACKAGE_kmod-nf-flow=y
++CONFIG_PACKAGE_kmod-nf-ipt=y
++CONFIG_PACKAGE_kmod-nf-ipt6=y
++CONFIG_PACKAGE_kmod-nf-nat=y
++CONFIG_PACKAGE_kmod-nf-reject=y
++CONFIG_PACKAGE_kmod-ppp=y
++CONFIG_PACKAGE_kmod-pppoe=y
++CONFIG_PACKAGE_kmod-pppox=y
++CONFIG_PACKAGE_kmod-slhc=y
++CONFIG_PACKAGE_kmod-gpio-button-hotplug=y
++CONFIG_PACKAGE_kmod-usb-core=y
++CONFIG_PACKAGE_kmod-usb-ehci=y
++CONFIG_PACKAGE_kmod-usb-ledtrig-usbport=y
++CONFIG_PACKAGE_kmod-usb-storage=y
++CONFIG_PACKAGE_kmod-usb-storage-extras=y
++CONFIG_PACKAGE_kmod-usb2=y
++CONFIG_PACKAGE_kmod-usb3=y
++CONFIG_PACKAGE_kmod-ath=y
++CONFIG_ATH_USER_REGD=y
++CONFIG_PACKAGE_ATH_DFS=y
++CONFIG_PACKAGE_kmod-ath9k=y
++CONFIG_ATH9K_UBNTHSR=y
++CONFIG_PACKAGE_kmod-ath9k-common=y
++CONFIG_PACKAGE_kmod-cfg80211=y
++CONFIG_PACKAGE_kmod-mac80211=y
++CONFIG_PACKAGE_MAC80211_DEBUGFS=y
++CONFIG_PACKAGE_MAC80211_MESH=y
++CONFIG_PACKAGE_libiwinfo-lua=y
++CONFIG_PACKAGE_lua=y
++CONFIG_PACKAGE_node=y
++CONFIG_PACKAGE_php7=y
++CONFIG_PHP7_FILTER=y
++CONFIG_PHP7_LIBXML=y
++CONFIG_PHP7_SYSTEMTZDATA=y
++CONFIG_PACKAGE_php7-cgi=y
++CONFIG_PACKAGE_php7-fastcgi=y
++CONFIG_PACKAGE_php7-mod-ctype=y
++CONFIG_PACKAGE_php7-mod-hash=y
++CONFIG_PACKAGE_php7-mod-json=y
++CONFIG_PACKAGE_php7-mod-mbstring=y
++CONFIG_PACKAGE_php7-mod-opcache=y
++CONFIG_PACKAGE_php7-mod-pdo=y
++CONFIG_PACKAGE_php7-mod-pdo-sqlite=y
++CONFIG_PACKAGE_php7-mod-session=y
++CONFIG_PACKAGE_php7-mod-sqlite3=y
++CONFIG_PACKAGE_php7-mod-tokenizer=y
++CONFIG_PACKAGE_php7-mod-xml=y
++CONFIG_PACKAGE_php7-mod-xmlreader=y
++CONFIG_PACKAGE_php7-mod-xmlwriter=y
++CONFIG_PACKAGE_libbz2=y
++CONFIG_PACKAGE_liblzma=y
++CONFIG_PACKAGE_libip4tc=y
++CONFIG_PACKAGE_libip6tc=y
++CONFIG_PACKAGE_libxtables=y
++CONFIG_PACKAGE_libmbedtls=y
++CONFIG_PACKAGE_libopenssl=y
++CONFIG_OPENSSL_WITH_ASM=y
++CONFIG_OPENSSL_WITH_DEPRECATED=y
++CONFIG_OPENSSL_WITH_ERROR_MESSAGES=y
++CONFIG_OPENSSL_WITH_TLS13=y
++CONFIG_OPENSSL_WITH_SRP=y
++CONFIG_OPENSSL_WITH_CMS=y
++CONFIG_OPENSSL_WITH_CHACHA_POLY1305=y
++CONFIG_OPENSSL_PREFER_CHACHA_OVER_GCM=y
++CONFIG_OPENSSL_WITH_PSK=y
++CONFIG_OPENSSL_ENGINE=y
++CONFIG_PACKAGE_libopenssl-conf=y
++CONFIG_PACKAGE_libsqlite3=y
++CONFIG_SQLITE3_DYNAMIC_EXTENSIONS=y
++CONFIG_SQLITE3_FTS3=y
++CONFIG_SQLITE3_FTS4=y
++CONFIG_SQLITE3_FTS5=y
++CONFIG_SQLITE3_JSON1=y
++CONFIG_SQLITE3_RTREE=y
++CONFIG_PACKAGE_bind-libs=y
++CONFIG_PACKAGE_libblkid=y
++CONFIG_PACKAGE_libblobmsg-json=y
++CONFIG_PACKAGE_libcap=y
++CONFIG_PACKAGE_libcomerr=y
++CONFIG_PACKAGE_libcurl=y
++CONFIG_LIBCURL_MBEDTLS=y
++CONFIG_LIBCURL_FILE=y
++CONFIG_LIBCURL_FTP=y
++CONFIG_LIBCURL_HTTP=y
++CONFIG_LIBCURL_COOKIES=y
++CONFIG_LIBCURL_NO_SMB="!"
++CONFIG_LIBCURL_PROXY=y
++CONFIG_PACKAGE_libelf=y
++CONFIG_PACKAGE_libext2fs=y
++CONFIG_PACKAGE_libfdisk=y
++CONFIG_PACKAGE_libhttp-parser=y
++CONFIG_PACKAGE_libiwinfo=y
++CONFIG_PACKAGE_libjson-c=y
++CONFIG_PACKAGE_liblua=y
++CONFIG_PACKAGE_liblucihttp=y
++CONFIG_PACKAGE_liblucihttp-lua=y
++CONFIG_PACKAGE_libncurses=y
++CONFIG_PACKAGE_libnghttp2=y
++CONFIG_PACKAGE_libnl-tiny=y
++CONFIG_PACKAGE_libpcre=y
++CONFIG_PACKAGE_libpopt=y
++CONFIG_PACKAGE_libreadline=y
++CONFIG_PACKAGE_libsmartcols=y
++CONFIG_PACKAGE_libss=y
++CONFIG_PACKAGE_libubox=y
++CONFIG_PACKAGE_libubus=y
++CONFIG_PACKAGE_libubus-lua=y
++CONFIG_PACKAGE_libuci=y
++CONFIG_PACKAGE_libuclient=y
++CONFIG_PACKAGE_libusb-1.0=y
++CONFIG_PACKAGE_libustream-openssl=y
++CONFIG_PACKAGE_libuuid=y
++CONFIG_PACKAGE_libuv=y
++CONFIG_PACKAGE_libwebsockets-full=y
++CONFIG_PACKAGE_libxml2=y
++CONFIG_RE2_SHARED=y
++CONFIG_PACKAGE_rpcd-mod-luci=y
++CONFIG_PACKAGE_rpcd-mod-rrdns=y
++CONFIG_PACKAGE_terminfo=y
++CONFIG_PACKAGE_zlib=y
++CONFIG_PACKAGE_luci-nginx=y
++CONFIG_PACKAGE_luci-base=y
++CONFIG_LUCI_JSMIN=y
++CONFIG_LUCI_CSSTIDY=y
++CONFIG_LUCI_LANG_zh_Hans=y
++CONFIG_PACKAGE_luci-compat=y
++CONFIG_PACKAGE_luci-mod-admin-full=y
++CONFIG_PACKAGE_luci-mod-network=y
++CONFIG_PACKAGE_luci-mod-status=y
++CONFIG_PACKAGE_luci-mod-system=y
++CONFIG_PACKAGE_luci-app-admconf=y
++CONFIG_PACKAGE_luci-app-firewall=y
++CONFIG_PACKAGE_luci-app-ngrokc=y
++CONFIG_PACKAGE_luci-app-opkg=y
++CONFIG_PACKAGE_luci-app-ramfree=y
++CONFIG_PACKAGE_luci-app-samba=y
++CONFIG_PACKAGE_luci-app-ttyd=y
++CONFIG_PACKAGE_luci-app-vlmcsd=y
++CONFIG_PACKAGE_luci-app-wol=y
++CONFIG_PACKAGE_luci-theme-bootstrap=y
++CONFIG_PACKAGE_luci-proto-ppp=y
++CONFIG_PACKAGE_luci-lib-ip=y
++CONFIG_PACKAGE_luci-lib-jsonc=y
++CONFIG_PACKAGE_luci-lib-nixio=y
++CONFIG_PACKAGE_luci-lib-nixio_notls=y
++CONFIG_PACKAGE_luci-i18n-base-zh-cn=y
++CONFIG_PACKAGE_luci-i18n-firewall-zh-cn=y
++CONFIG_PACKAGE_luci-i18n-opkg-zh-cn=y
++CONFIG_PACKAGE_luci-i18n-ramfree-zh-cn=y
++CONFIG_PACKAGE_luci-i18n-samba-zh-cn=y
++CONFIG_PACKAGE_luci-i18n-ttyd-zh-cn=y
++CONFIG_PACKAGE_luci-i18n-vlmcsd-zh-cn=y
++CONFIG_PACKAGE_luci-i18n-wol-zh-cn=y
++CONFIG_POSTFIX_TLS=y
++CONFIG_POSTFIX_SASL=y
++CONFIG_POSTFIX_LDAP=y
++CONFIG_POSTFIX_CDB=y
++CONFIG_POSTFIX_SQLITE=y
++CONFIG_POSTFIX_PCRE=y
++CONFIG_PACKAGE_curl=y
++CONFIG_PACKAGE_rsync=y
++CONFIG_RSYNC_zlib=y
++CONFIG_PACKAGE_vsftpd-tls=y
++CONFIG_PACKAGE_wget=y
++CONFIG_PACKAGE_iptables=y
++CONFIG_PACKAGE_bind-client=y
++CONFIG_DNSDIST_OPENSSL=y
++CONFIG_OPENLDAP_DEBUG=y
++CONFIG_PACKAGE_ip-full=y
++CONFIG_PACKAGE_cgi-io=y
++CONFIG_PACKAGE_nginx=y
++CONFIG_NGINX_UBUS=y
++CONFIG_NGINX_HTTP_CHARSET=y
++CONFIG_NGINX_HTTP_GZIP=y
++CONFIG_NGINX_HTTP_SSI=y
++CONFIG_NGINX_HTTP_USERID=y
++CONFIG_NGINX_HTTP_ACCESS=y
++CONFIG_NGINX_HTTP_AUTH_BASIC=y
++CONFIG_NGINX_HTTP_AUTOINDEX=y
++CONFIG_NGINX_HTTP_GEO=y
++CONFIG_NGINX_HTTP_MAP=y
++CONFIG_NGINX_HTTP_SPLIT_CLIENTS=y
++CONFIG_NGINX_HTTP_REFERER=y
++CONFIG_NGINX_HTTP_REWRITE=y
++CONFIG_NGINX_HTTP_PROXY=y
++CONFIG_NGINX_HTTP_FASTCGI=y
++CONFIG_NGINX_HTTP_UWSGI=y
++CONFIG_NGINX_HTTP_SCGI=y
++CONFIG_NGINX_HTTP_MEMCACHED=y
++CONFIG_NGINX_HTTP_LIMIT_CONN=y
++CONFIG_NGINX_HTTP_LIMIT_REQ=y
++CONFIG_NGINX_HTTP_EMPTY_GIF=y
++CONFIG_NGINX_HTTP_BROWSER=y
++CONFIG_NGINX_HTTP_UPSTREAM_HASH=y
++CONFIG_NGINX_HTTP_UPSTREAM_IP_HASH=y
++CONFIG_NGINX_HTTP_UPSTREAM_LEAST_CONN=y
++CONFIG_NGINX_HTTP_UPSTREAM_KEEPALIVE=y
++CONFIG_NGINX_HTTP_CACHE=y
++CONFIG_NGINX_PCRE=y
++CONFIG_NGINX_NAXSI=y
++CONFIG_NGINX_HEADERS_MORE=y
++CONFIG_PACKAGE_nginx-mod-luci=y
++CONFIG_PACKAGE_ngrokc=y
++CONFIG_PACKAGE_uwsgi=y
++CONFIG_PACKAGE_uwsgi-cgi-plugin=y
++CONFIG_PACKAGE_uwsgi-luci-support=y
++CONFIG_PACKAGE_uwsgi-syslog-plugin=y
++CONFIG_PACKAGE_etherwake=y
++CONFIG_PACKAGE_hostapd-common=y
++CONFIG_PACKAGE_iw=y
++CONFIG_PACKAGE_ppp=y
++CONFIG_PACKAGE_ppp-mod-pppoe=y
++CONFIG_PACKAGE_samba36-server=y
++CONFIG_PACKAGE_SAMBA_MAX_DEBUG_LEVEL=-1
++CONFIG_PACKAGE_uclient-fetch=y
++CONFIG_PACKAGE_vlmcsd=y
++CONFIG_PACKAGE_wol=y
++CONFIG_WPA_MSG_MIN_PRIORITY=3
++CONFIG_DRIVER_11N_SUPPORT=y
++CONFIG_DRIVER_11W_SUPPORT=y
++CONFIG_PACKAGE_wpad-basic=y
++CONFIG_PACKAGE_uboot-envtools=y
++CONFIG_PACKAGE_bzip2=y
++CONFIG_PACKAGE_gzip=y
++CONFIG_PACKAGE_xz-utils=y
++CONFIG_PACKAGE_xz=y
++CONFIG_PACKAGE_blkid=y
++CONFIG_PACKAGE_fdisk=y
++CONFIG_PACKAGE_e2fsprogs=y
++CONFIG_PACKAGE_bash=y
++CONFIG_PACKAGE_ttyd=y
++CONFIG_PACKAGE_zoneinfo-asia=y
++CONFIG_PACKAGE_zoneinfo-core=y
++CONFIG_PACKAGE_iwinfo=y
++CONFIG_PACKAGE_jshn=y
++CONFIG_PACKAGE_libjson-script=y
++CONFIG_PACKAGE_openssl-util=y
++CONFIG_STRACE_NONE=y
++CONFIG_PACKAGE_tar=y
++CONFIG_PACKAGE_TAR_GZIP=y
++CONFIG_PACKAGE_TAR_BZIP2=y
++CONFIG_PACKAGE_TAR_XZ=y
++CONFIG_PACKAGE_usbutils=y
+diff --git a/include/target.mk b/include/target.mk
+index 7b0e92fce8..e615ea53bb 100644
+--- a/include/target.mk
++++ b/include/target.mk
+@@ -13,11 +13,11 @@ __target_inc=1
+ DEVICE_TYPE?=router
+ 
+ # Default packages - the really basic set
+-DEFAULT_PACKAGES:=base-files libc libgcc busybox dropbear mtd uci opkg netifd fstools uclient-fetch logd urandom-seed urngd
++DEFAULT_PACKAGES:=base-files libc libgcc busybox dropbear mtd uci bash wget curl block-mount fdisk lsblk bind-client opkg netifd fstools uclient-fetch logd urandom-seed urngd
+ # For nas targets
+ DEFAULT_PACKAGES.nas:=block-mount fdisk lsblk mdadm
+ # For router targets
+-DEFAULT_PACKAGES.router:=dnsmasq iptables ip6tables ppp ppp-mod-pppoe firewall odhcpd-ipv6only odhcp6c kmod-ipt-offload
++DEFAULT_PACKAGES.router:=dnsmasq-full iptables ip6tables ppp ppp-mod-pppoe firewall odhcpd-ipv6only odhcp6c kmod-ipt-offload
+ DEFAULT_PACKAGES.bootloader:=
+ 
+ ifneq ($(DUMP),)
+diff --git a/include/version.mk b/include/version.mk
+index 7c2d92a833..1677464a3f 100644
+--- a/include/version.mk
++++ b/include/version.mk
+@@ -32,7 +32,7 @@ VERSION_CODE:=$(call qstrip,$(CONFIG_VERSION_CODE))
+ VERSION_CODE:=$(if $(VERSION_CODE),$(VERSION_CODE),r11306-c4a6851c72)
+ 
+ VERSION_REPO:=$(call qstrip,$(CONFIG_VERSION_REPO))
+-VERSION_REPO:=$(if $(VERSION_REPO),$(VERSION_REPO),http://downloads.openwrt.org/releases/19.07.7)
++VERSION_REPO:=$(if $(VERSION_REPO),$(VERSION_REPO),https://mirrors.cloud.tencent.com/openwrt/releases/19.07.7)
+ 
+ VERSION_DIST:=$(call qstrip,$(CONFIG_VERSION_DIST))
+ VERSION_DIST:=$(if $(VERSION_DIST),$(VERSION_DIST),OpenWrt)
+diff --git a/package/base-files/Makefile b/package/base-files/Makefile
+index f2af97f7e6..dcf62a58f4 100644
+--- a/package/base-files/Makefile
++++ b/package/base-files/Makefile
+@@ -81,9 +81,9 @@ define ImageConfigOptions
+ 	echo 'pi_init_cmd=$(if $(CONFIG_TARGET_INIT_CMD),$(CONFIG_TARGET_INIT_CMD),"/sbin/init")' >>$(1)/lib/preinit/00_preinit.conf
+ 	echo 'pi_init_suppress_stderr="$(CONFIG_TARGET_INIT_SUPPRESS_STDERR)"' >>$(1)/lib/preinit/00_preinit.conf
+ 	echo 'pi_ifname=$(if $(CONFIG_TARGET_PREINIT_IFNAME),$(CONFIG_TARGET_PREINIT_IFNAME),"")' >>$(1)/lib/preinit/00_preinit.conf
+-	echo 'pi_ip=$(if $(CONFIG_TARGET_PREINIT_IP),$(CONFIG_TARGET_PREINIT_IP),"192.168.1.1")' >>$(1)/lib/preinit/00_preinit.conf
++	echo 'pi_ip=$(if $(CONFIG_TARGET_PREINIT_IP),$(CONFIG_TARGET_PREINIT_IP),"192.168.33.1")' >>$(1)/lib/preinit/00_preinit.conf
+ 	echo 'pi_netmask=$(if $(CONFIG_TARGET_PREINIT_NETMASK),$(CONFIG_TARGET_PREINIT_NETMASK),"255.255.255.0")' >>$(1)/lib/preinit/00_preinit.conf
+-	echo 'pi_broadcast=$(if $(CONFIG_TARGET_PREINIT_BROADCAST),$(CONFIG_TARGET_PREINIT_BROADCAST),"192.168.1.255")' >>$(1)/lib/preinit/00_preinit.conf
++	echo 'pi_broadcast=$(if $(CONFIG_TARGET_PREINIT_BROADCAST),$(CONFIG_TARGET_PREINIT_BROADCAST),"192.168.33.255")' >>$(1)/lib/preinit/00_preinit.conf
+ 	echo 'pi_preinit_net_messages="$(CONFIG_TARGET_PREINIT_SHOW_NETMSG)"' >>$(1)/lib/preinit/00_preinit.conf
+ 	echo 'pi_preinit_no_failsafe_netmsg="$(CONFIG_TARGET_PREINIT_SUPPRESS_FAILSAFE_NETMSG)"' >>$(1)/lib/preinit/00_preinit.conf
+ 	echo 'pi_preinit_no_failsafe="$(CONFIG_TARGET_PREINIT_DISABLE_FAILSAFE)"' >>$(1)/lib/preinit/00_preinit.conf
+diff --git a/package/base-files/files/bin/config_generate b/package/base-files/files/bin/config_generate
+index 3bf48d7216..3fa20f3493 100755
+--- a/package/base-files/files/bin/config_generate
++++ b/package/base-files/files/bin/config_generate
+@@ -100,7 +100,7 @@ generate_network() {
+ 		static)
+ 			local ipad
+ 			case "$1" in
+-				lan) ipad=${ipaddr:-"192.168.1.1"} ;;
++				lan) ipad=${ipaddr:-"192.168.33.1"} ;;
+ 				*) ipad=${ipaddr:-"192.168.$((addr_offset++)).1"} ;;
+ 			esac
+ 
+@@ -241,8 +241,9 @@ generate_static_system() {
+ 	uci -q batch <<-EOF
+ 		delete system.@system[0]
+ 		add system system
+-		set system.@system[-1].hostname='OpenWrt'
+-		set system.@system[-1].timezone='UTC'
++		set system.@system[-1].hostname='router'
++		set system.@system[-1].timezone='CST-8'
++		set system.@system[-1].zonename='Asia/Shanghai'
+ 		set system.@system[-1].ttylogin='0'
+ 		set system.@system[-1].log_size='64'
+ 		set system.@system[-1].urandom_seed='0'
+@@ -251,10 +252,10 @@ generate_static_system() {
+ 		set system.ntp='timeserver'
+ 		set system.ntp.enabled='1'
+ 		set system.ntp.enable_server='0'
+-		add_list system.ntp.server='0.openwrt.pool.ntp.org'
+-		add_list system.ntp.server='1.openwrt.pool.ntp.org'
+-		add_list system.ntp.server='2.openwrt.pool.ntp.org'
+-		add_list system.ntp.server='3.openwrt.pool.ntp.org'
++		add_list system.ntp.server='ntp1.aliyun.com'
++		add_list system.ntp.server='time1.cloud.tencent.com'
++		add_list system.ntp.server='time.ustc.edu.cn'
++		add_list system.ntp.server='cn.pool.ntp.org'
+ 	EOF
+ 
+ 	if json_is_a system object; then
+diff --git a/package/base-files/files/etc/banner b/package/base-files/files/etc/banner
+index f3af3c014f..f255249fdb 100644
+--- a/package/base-files/files/etc/banner
++++ b/package/base-files/files/etc/banner
+@@ -4,5 +4,5 @@
+  |_______||   __|_____|__|__||________||__|  |____|
+           |__| W I R E L E S S   F R E E D O M
+  -----------------------------------------------------
+- %D %V, %C
++ %D %V, %C神雕固件dragino2专用
+  -----------------------------------------------------
+diff --git a/package/base-files/files/etc/nginx/conf.d/vhost.conf b/package/base-files/files/etc/nginx/conf.d/vhost.conf
+new file mode 100755
+index 0000000000..17496bcf8a
+--- /dev/null
++++ b/package/base-files/files/etc/nginx/conf.d/vhost.conf
+@@ -0,0 +1,13 @@
++server {
++        listen       8082;
++        server_name  localhost;
++        root  /mnt/sda1/web;
++        index  index.html index.htm index.php default.php;
++        error_page   500 502 503 504  /50x.html;
++	location / {
++		autoindex on;
++		autoindex_exact_size off;
++		autoindex_localtime on;
++		charset utf-8,gbk;
++        }
++}
+diff --git a/package/base-files/files/etc/passwd b/package/base-files/files/etc/passwd
+index 1d06a80361..a60ca9cce0 100644
+--- a/package/base-files/files/etc/passwd
++++ b/package/base-files/files/etc/passwd
+@@ -1,4 +1,4 @@
+-root:x:0:0:root:/root:/bin/ash
++ecoo:x:0:0:root:/root:/bin/bash
+ daemon:*:1:1:daemon:/var:/bin/false
+ ftp:*:55:55:ftp:/home/ftp:/bin/false
+ network:*:101:101:network:/var:/bin/false
+diff --git a/package/base-files/files/etc/rc.local b/package/base-files/files/etc/rc.local
+index 56394773c3..3a29610203 100644
+--- a/package/base-files/files/etc/rc.local
++++ b/package/base-files/files/etc/rc.local
+@@ -1,4 +1,16 @@
+ # Put your custom commands here that should be executed once
+ # the system init finished. By default this file does nothing.
+-
++#dd if=/dev/zero of=iscsi.img count=0 obs=1 seek=50G
++#tgtadm --lld iscsi --op new --mode logicalunit --tid 3 --lun 1 -b /mnt/sda1/iscsi-windows.img
++#tgtadm --lld iscsi --op show --mode target
++#sed -i 's_downloads.openwrt.org_mirrors.ustc.edu.cn/openwrt_' /etc/opkg/distfeeds.conf
++#echo "#0 4 * * * reboot" > /etc/crontabs/root
++if [ -f /mnt/sda1/router/settings.sh ]; then
++	echo "配置新的settings脚本中"
++	cp -a /mnt/sda1/router/settings.sh /etc/
++	chmod +x /etc/settings.sh > /dev/null
++	bash /etc/settings.sh
++else
++	echo "磁盘未挂载或者新的配置文件不存在"
++fi
+ exit 0
+diff --git a/package/base-files/files/etc/shadow b/package/base-files/files/etc/shadow
+index 4b4154f21f..d675de17b7 100644
+--- a/package/base-files/files/etc/shadow
++++ b/package/base-files/files/etc/shadow
+@@ -1,4 +1,4 @@
+-root::0:0:99999:7:::
++ecoo:$1$V4UetPzk$CYXluq4wUazHjmCDBCqXF.:0:0:99999:7:::
+ daemon:*:0:0:99999:7:::
+ ftp:*:0:0:99999:7:::
+ network:*:0:0:99999:7:::
+diff --git a/package/base-files/files/usr/libexec/login.sh b/package/base-files/files/usr/libexec/login.sh
+index 1fff39c6a0..5121506772 100755
+--- a/package/base-files/files/usr/libexec/login.sh
++++ b/package/base-files/files/usr/libexec/login.sh
+@@ -1,5 +1,5 @@
+ #!/bin/sh
+ 
+-[ "$(uci -q get system.@system[0].ttylogin)" = 1 ] || exec /bin/ash --login
++[ "$(uci -q get system.@system[0].ttylogin)" = 1 ] || exec /bin/login
+ 
+ exec /bin/login
+diff --git a/package/base-files/image-config.in b/package/base-files/image-config.in
+index 3bed22d641..eae54c4257 100644
+--- a/package/base-files/image-config.in
++++ b/package/base-files/image-config.in
+@@ -76,7 +76,7 @@ config TARGET_PREINIT_IFNAME
+ config TARGET_PREINIT_IP
+ 	string
+ 	prompt "IP address for preinit network messages" if PREINITOPT
+-	default "192.168.1.1"
++	default "192.168.33.1"
+ 	help
+ 		IP address used to configure interface for preinit network
+ 		messages, including failsafe messages
+@@ -92,7 +92,7 @@ config TARGET_PREINIT_NETMASK
+ config TARGET_PREINIT_BROADCAST
+ 	string
+ 	prompt "Broadcast address for preinit network messages" if PREINITOPT
+-	default "192.168.1.255"
++	default "192.168.33.255"
+ 	help
+ 		Broadcast address to which to send preinit network messages, as
+ 		as failsafe messages
+@@ -183,7 +183,7 @@ if VERSIONOPT
+ 	config VERSION_REPO
+ 		string
+ 		prompt "Release repository"
+-		default "http://downloads.openwrt.org/releases/19.07.7"
++		default "https://mirrors.cloud.tencent.com/openwrt/releases/19.07.7"
+ 		help
+ 			This is the repository address embedded in the image, it defaults
+ 			to the trunk snapshot repo; the url may contain the following placeholders:
+diff --git a/package/kernel/linux/files/sysctl-nf-conntrack.conf b/package/kernel/linux/files/sysctl-nf-conntrack.conf
+index 37baf5fd6f..558154d73a 100644
+--- a/package/kernel/linux/files/sysctl-nf-conntrack.conf
++++ b/package/kernel/linux/files/sysctl-nf-conntrack.conf
+@@ -3,7 +3,7 @@
+ 
+ net.netfilter.nf_conntrack_acct=1
+ net.netfilter.nf_conntrack_checksum=0
+-net.netfilter.nf_conntrack_max=16384
++net.netfilter.nf_conntrack_max=65536
+ net.netfilter.nf_conntrack_tcp_timeout_established=7440
+ net.netfilter.nf_conntrack_udp_timeout=60
+ net.netfilter.nf_conntrack_udp_timeout_stream=180
+diff --git a/package/network/config/firewall/files/firewall.config b/package/network/config/firewall/files/firewall.config
+index 8874e9882c..c113f1fc25 100644
+--- a/package/network/config/firewall/files/firewall.config
++++ b/package/network/config/firewall/files/firewall.config
+@@ -3,6 +3,7 @@ config defaults
+ 	option input		ACCEPT
+ 	option output		ACCEPT
+ 	option forward		REJECT
++	option flow_offloading	1
+ # Uncomment this line to disable ipv6 rules
+ #	option disable_ipv6	1
+ 
+@@ -129,6 +130,43 @@ config rule
+ 	option proto		udp
+ 	option target		ACCEPT
+ 
++config rule
++	option name		http8082
++	option proto		tcp
++	option dest_port	8082
++	option target		ACCEPT
++	option src		wan
++
++config rule
++	option name		http8083
++	option proto		tcp
++	option dest_port	8083
++	option target		ACCEPT
++	option src		wan
++
++config rule
++	option name		ssh8022
++	option proto		tcp
++	option dest_port	8022
++	option target		ACCEPT
++	option src		wan
++
++config rule
++	option name		ftp21
++	option proto		tcp
++	option dest_port	21
++	option target		ACCEPT
++	option src		wan
++	
++config redirect
++	option target		DNAT
++	option name		ssh
++	option src		wan
++	option src_dport	8022
++	option dest		lan
++	option dest_ip		192.168.33.1
++	option dest_port	22
++		
+ # include a file with users custom iptables rules
+ config include
+ 	option path /etc/firewall.user
+diff --git a/package/network/services/dropbear/files/dropbear.config b/package/network/services/dropbear/files/dropbear.config
+index 2139ba0bbe..e2a936d7af 100644
+--- a/package/network/services/dropbear/files/dropbear.config
++++ b/package/network/services/dropbear/files/dropbear.config
+@@ -2,4 +2,5 @@ config dropbear
+ 	option PasswordAuth 'on'
+ 	option RootPasswordAuth 'on'
+ 	option Port         '22'
++	option Interface 'lan'
+ #	option BannerFile   '/etc/banner'
+diff --git a/package/network/services/samba36/files/samba.config b/package/network/services/samba36/files/samba.config
+index c79db0d322..3d5396c715 100644
+--- a/package/network/services/samba36/files/samba.config
++++ b/package/network/services/samba36/files/samba.config
+@@ -1,6 +1,6 @@
+ config samba
+-	option 'name'			'OpenWrt'
++	option 'name'			'router'
+ 	option 'workgroup'		'WORKGROUP'
+-	option 'description'		'OpenWrt'
++	option 'description'		'router'
+ 	option 'homes'			'1'
+ 
+diff --git a/package/network/services/uhttpd/files/uhttpd.config b/package/network/services/uhttpd/files/uhttpd.config
+index 39089ca25b..ca7a302353 100644
+--- a/package/network/services/uhttpd/files/uhttpd.config
++++ b/package/network/services/uhttpd/files/uhttpd.config
+@@ -2,8 +2,8 @@
+ config uhttpd main
+ 
+ 	# HTTP listen addresses, multiple allowed
+-	list listen_http	0.0.0.0:80
+-	list listen_http	[::]:80
++	list listen_http	0.0.0.0:8083
++	list listen_http	[::]:8083
+ 
+ 	# HTTPS listen addresses, multiple allowed
+ 	list listen_https	0.0.0.0:443
+@@ -46,6 +46,7 @@ config uhttpd main
+ 	# Files with an associated interpreter can
+ 	# be called outside of the CGI prefix and do
+ 	# not need to be executable.
++	list index_page	"cgi-bin/luci"
+ #	list interpreter	".php=/usr/bin/php-cgi"
+ #	list interpreter	".cgi=/usr/bin/perl"
+ 
+@@ -111,7 +112,17 @@ config uhttpd main
+ 	# resources.
+ #	list httpauth prefix_user
+ 
+-
++config uhttpd web
++	option tcp_keepalive '1'
++	# HTTP listen addresses, multiple allowed
++	list listen_http	0.0.0.0:8082
++	list listen_http	[::]:8082
++	option redirect_https '0'
++	option rfc1918_filter '0'
++	list index_page 'index.html'
++	list interpreter '.php=/usr/bin/php-cgi'
++	option home '/mnt/sda1/web'
++	
+ # Defaults for automatic certificate and key generation
+ config cert defaults
+ 
+diff --git a/package/system/fstools/Makefile b/package/system/fstools/Makefile
+index d5f44893c2..0cc4927cc2 100644
+--- a/package/system/fstools/Makefile
++++ b/package/system/fstools/Makefile
+@@ -110,6 +110,7 @@ define Package/block-mount/install
+ 	$(INSTALL_BIN) ./files/fstab.init $(1)/etc/init.d/fstab
+ 	$(INSTALL_CONF) ./files/fstab.default $(1)/etc/uci-defaults/10-fstab
+ 	$(INSTALL_CONF) ./files/mount.hotplug $(1)/etc/hotplug.d/block/10-mount
++	$(INSTALL_DATA) ./files/10-auto-mount $(1)/etc/hotplug.d/block/10-auto-mount
+ 	$(INSTALL_CONF) ./files/media-change.hotplug  $(1)/etc/hotplug.d/block/00-media-change
+ 
+ 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/sbin/block $(1)/sbin/
+diff --git a/package/system/fstools/files/10-auto-mount b/package/system/fstools/files/10-auto-mount
+new file mode 100644
+index 0000000000..a2f2353e5b
+--- /dev/null
++++ b/package/system/fstools/files/10-auto-mount
+@@ -0,0 +1,85 @@
++#!/bin/sh
++
++set_fstab(){
++
++	my_fstype="`block info | grep "/dev/$device" | awk -F 'TYPE="' '{print $2}' | sed 's/\"//'`"
++	
++	[ -n "$my_fstype" ] && {
++		logger -t Auto-Mount "New block.File system:${my_fstype}"
++		if [ "$my_fstype" = 'swap' ]; then
++			
++			n=$(uci show fstab | grep "fstab.@swap" | grep -c "=swap")
++			
++			[ $n -gt 0 ] && {
++				for i in $(seq 0 $n)
++				do
++					old_swap="$(uci get fstab.@swap[$i].device)"
++					[ "$old_swap" = "/dev/$device" ] && {
++						FLAG="SKIP"
++						break
++					}
++				done
++			}
++
++			[ "$FLAG" != "SKIP" ] && {
++				uci add fstab swap
++				uci set fstab.@swap[$n]="swap"
++				uci set fstab.@swap[$n].enabled='1'
++				uci set fstab.@swap[$n].device="/dev/$device"
++			}
++
++		else
++			
++			section=$(echo $get_uuid | sed 's/-//g')
++
++			uci set fstab.${section}="mount"
++			uci set fstab.${section}.enabled=1
++			uci set fstab.${section}.uuid="${get_uuid}"
++			uci set fstab.${section}.target="/mnt/$device"
++			uci set fstab.${section}.fstype="$my_fstype"
++
++			case "$my_fstype" in
++				ext*)
++					uci set fstab.${section}.options="noatime";;
++				'ntfs')
++				if [ $(lsmod | grep -c ufsd) -ge 1 ]
++				then
++					uci set fstab.${section}.fstype="ufsd"
++					uci set fstab.${section}.options="noatime,nls=utf8,force"
++				else
++					uci set fstab.${section}.fstype="ntfs-3g"
++					uci set fstab.${section}.options="noatime,iocharset=utf8,big_writes"
++				fi
++				;;
++				'exfat')
++					uci set fstab.${section}.options="noatime";;
++				'vfat')
++					uci set fstab.${section}.options="iocharset=utf8,umask=0000,dmask=0000,fmask=0000";;
++                *)
++                    uci set fstab.${section}.enabled=0;;
++			esac
++		fi
++		uci commit fstab
++	}
++}
++
++blkdev=`dirname $DEVPATH`
++if [ `basename $blkdev` != "block" ]; then
++
++    device=`basename $DEVPATH`
++    mountpoint=`sed -ne "s|^[^ ]*/$device ||; T; s/ .*//p" /proc/self/mounts`
++
++    case "$ACTION" in
++	add)
++		get_uuid=`block info | grep "/dev/${device}" | awk -F "UUID=" '{print $2}'| awk -F "\"" '{print $2}'`
++		[ -n "$get_uuid" ] && {
++			logger -t Auto-Mount "Block /dev/${device} added."
++			logger -t Auto-Mount "UUID=$get_uuid"
++			have_uuid=$(uci show fstab | grep -c "$get_uuid")
++			[ "$have_uuid" = "0" ] && set_fstab
++        		mkdir -p /mnt/$device
++		}
++		;;
++    esac	
++
++fi
+diff --git a/package/system/rpcd/files/rpcd.config b/package/system/rpcd/files/rpcd.config
+index faaed7f538..3b3997218c 100644
+--- a/package/system/rpcd/files/rpcd.config
++++ b/package/system/rpcd/files/rpcd.config
+@@ -3,8 +3,8 @@ config rpcd
+ 	option timeout 30
+ 
+ config login
+-	option username 'root'
+-	option password '$p$root'
++	option username 'ecoo'
++	option password '$p$ecoo'
+ 	list read '*'
+ 	list write '*'
+ 
+diff --git a/scripts/download.pl b/scripts/download.pl
+index 2876ae5807..1370499e78 100755
+--- a/scripts/download.pl
++++ b/scripts/download.pl
+@@ -235,6 +235,7 @@ foreach my $mirror (@ARGV) {
+ 			push @extra, "$extra[0]/longterm/v$1";
+ 		}		
+ 		foreach my $dir (@extra) {
++			push @mirrors, "https://mirrors.ustc.edu.cn/kernel.org/$dir";
+ 			push @mirrors, "https://cdn.kernel.org/pub/$dir";
+ 			push @mirrors, "https://mirror.rackspace.com/kernel.org/$dir";
+ 			push @mirrors, "http://download.xs4all.nl/ftp.kernel.org/pub/$dir";
+diff --git a/tools/Makefile b/tools/Makefile
+index b8d986b80c..3722512319 100644
+--- a/tools/Makefile
++++ b/tools/Makefile
+@@ -24,7 +24,7 @@ endif
+ tools-$(BUILD_TOOLCHAIN) += gmp mpfr mpc libelf expat
+ tools-y += m4 libtool autoconf automake flex bison pkg-config mklibs zlib
+ tools-y += sstrip make-ext4fs e2fsprogs mtd-utils mkimage
+-tools-y += firmware-utils patch-image quilt padjffs2
++tools-y += firmware-utils patch-image quilt padjffs2 ucl upx
+ tools-y += mm-macros missing-macros cmake scons bc findutils gengetopt patchelf
+ tools-y += mtools dosfstools libressl
+ tools-$(CONFIG_TARGET_orion_generic) += wrt350nv2-builder upslug2
+@@ -73,6 +73,7 @@ $(curdir)/libressl/compile := $(curdir)/pkg-config/compile
+ $(curdir)/mkimage/compile += $(curdir)/libressl/compile
+ $(curdir)/firmware-utils/compile += $(curdir)/libressl/compile $(curdir)/zlib/compile
+ $(curdir)/cmake/compile += $(curdir)/libressl/compile
++$(curdir)/upx/compile := $(curdir)/ucl/compile
+ $(curdir)/zlib/compile := $(curdir)/cmake/compile
+ $(curdir)/wrt350nv2-builder/compile := $(curdir)/zlib/compile
+ $(curdir)/lzma-old/compile := $(curdir)/zlib/compile
+diff --git a/tools/ucl/Makefile b/tools/ucl/Makefile
+new file mode 100644
+index 0000000000..9fb9aec117
+--- /dev/null
++++ b/tools/ucl/Makefile
+@@ -0,0 +1,51 @@
++#
++# Copyright (C) 2019 OpenWrt.org
++#
++# This is free software, licensed under the GNU General Public License v2.
++# See /LICENSE for more information.
++#
++include $(TOPDIR)/rules.mk
++
++PKG_NAME:=ucl
++PKG_VERSION:=1.03
++
++PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
++PKG_SOURCE_URL:=http://www.oberhumer.com/opensource/ucl/download/$(PKG_SOURCE)
++PKG_HASH:=b865299ffd45d73412293369c9754b07637680e5c826915f097577cd27350348
++
++HOST_BUILD_DIR:=$(BUILD_DIR_HOST)/$(PKG_NAME)-$(PKG_VERSION)
++
++include $(INCLUDE_DIR)/host-build.mk
++
++HOSTCC :=gcc
++HOST_CFLAGS +=-std=gnu89
++
++define Host/Prepare
++	$(Host/Prepare/Default)
++	mkdir -p $(STAGING_DIR_HOST)/include/ucl
++endef
++
++define Host/Configure
++	(cd $(HOST_BUILD_DIR); \
++	CC="$(HOSTCC)" \
++	CFLAGS="$(HOST_CFLAGS)" \
++	./configure --prefix=$(STAGING_DIR_HOST) \
++	);
++	$(call Host/Configure/Default)
++endef
++
++define Host/Compile
++	$(MAKE) -C $(HOST_BUILD_DIR)
++endef
++
++define Host/Install
++	$(MAKE) -C $(HOST_BUILD_DIR) install
++endef
++
++define Host/Clean
++	$(MAKE) -C $(HOST_BUILD_DIR) uninstall
++	rm -rf $(HOST_BUILD_DIR)
++	rm -rf $(STAGING_DIR_HOST)/include/ucl
++endef
++
++$(eval $(call HostBuild))
+diff --git a/tools/upx/Makefile b/tools/upx/Makefile
+new file mode 100644
+index 0000000000..fbf1dfbd2e
+--- /dev/null
++++ b/tools/upx/Makefile
+@@ -0,0 +1,35 @@
++#
++# Copyright (C) 2011-2020 OpenWrt.org
++#
++# This is free software, licensed under the GNU General Public License v2.
++# See /LICENSE for more information.
++#
++include $(TOPDIR)/rules.mk
++
++PKG_NAME:=upx
++PKG_VERSION:=3.95
++
++PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-src.tar.xz
++PKG_SOURCE_URL:=https://github.com/upx/upx/releases/download/v$(PKG_VERSION)
++PKG_HASH:=3b0f55468d285c760fcf5ea865a070b27696393002712054c69ff40d8f7f5592
++
++HOST_BUILD_DIR:=$(BUILD_DIR_HOST)/$(PKG_NAME)-$(PKG_VERSION)-src
++
++include $(INCLUDE_DIR)/host-build.mk
++
++define Host/Compile
++	UPX_UCLDIR=$(STAGING_DIR_HOST) \
++	$(MAKE) -C $(HOST_BUILD_DIR)/src \
++		CXXFLAGS_WERROR="" LDFLAGS="$(HOST_LDFLAGS)" \
++		CXX="$(HOSTCXX)"
++endef
++
++define Host/Install
++	$(CP) $(HOST_BUILD_DIR)/src/upx.out $(STAGING_DIR_HOST)/bin/upx
++endef
++
++define Host/Clean
++	rm -f $(STAGING_DIR_HOST)/bin/upx
++endef
++
++$(eval $(call HostBuild))
+-- 
+2.25.1
+
