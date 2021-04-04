@@ -1,4 +1,4 @@
-From ad0595c844c197c4db5d0f93a061e4590e05e093 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: slitaz-cn <teasiu@163.com>
 Date: Tue, 30 Mar 2021 14:30:39 +0800
 Subject: [PATCH 2/6] luci-base: add nas section menu

@@ -1,0 +1,427 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: slitaz-cn <teasiu@163.com>
+Date: Thu, 1 Apr 2021 11:26:39 +0800
+Subject: [PATCH] set dragino2 luci nginx as default
+
+Signed-off-by: slitaz-cn <teasiu@163.com>
+---
+ feeds.conf.default                            |  2 +-
+ include/target.mk                             |  2 +-
+ include/version.mk                            |  2 +-
+ package/base-files/Makefile                   |  4 +-
+ package/base-files/files/bin/config_generate  | 15 ++--
+ package/base-files/files/etc/banner           |  2 +-
+ .../files/etc/nginx/conf.d/vhost.conf         | 13 +++
+ package/base-files/files/etc/passwd           |  2 +-
+ package/base-files/files/etc/rc.local         | 14 ++-
+ package/base-files/files/etc/shadow           |  2 +-
+ package/base-files/image-config.in            |  6 +-
+ .../linux/files/sysctl-nf-conntrack.conf      |  2 +-
+ .../config/firewall/files/firewall.config     | 37 ++++++++
+ .../services/dropbear/files/dropbear.config   |  1 +
+ .../services/samba36/files/samba.config       |  4 +-
+ package/system/fstools/Makefile               |  1 +
+ package/system/fstools/files/10-auto-mount    | 85 +++++++++++++++++++
+ scripts/download.pl                           |  1 +
+ 18 files changed, 173 insertions(+), 22 deletions(-)
+ create mode 100755 package/base-files/files/etc/nginx/conf.d/vhost.conf
+ create mode 100644 package/system/fstools/files/10-auto-mount
+
+diff --git a/feeds.conf.default b/feeds.conf.default
+index 841430159c..047c789bfa 100644
+--- a/feeds.conf.default
++++ b/feeds.conf.default
+@@ -1,5 +1,5 @@
+ src-git packages https://git.openwrt.org/feed/packages.git^90af10d01579425369bd474051b6d3ddaf32a7e3
+-src-git luci https://git.openwrt.org/project/luci.git^34e0d656a41befd9720be35c4831c9f136a67c59
++src-git luci https://git.openwrt.org/project/luci.git^7456e2a
+ src-git routing https://git.openwrt.org/feed/routing.git^e26b4745209655976b7d124465b1dc53ade632f9
+ src-git telephony https://git.openwrt.org/feed/telephony.git^6e019c94d0fa7162548d528bf4ba060a61f8cb59
+ src-git freifunk https://github.com/freifunk/openwrt-packages.git^c621a4283870fe062489fe5e26a15deda7ef4ed7
+diff --git a/include/target.mk b/include/target.mk
+index 7b0e92fce8..5e89bfd0f4 100644
+--- a/include/target.mk
++++ b/include/target.mk
+@@ -13,7 +13,7 @@ __target_inc=1
+ DEVICE_TYPE?=router
+ 
+ # Default packages - the really basic set
+-DEFAULT_PACKAGES:=base-files libc libgcc busybox dropbear mtd uci opkg netifd fstools uclient-fetch logd urandom-seed urngd
++DEFAULT_PACKAGES:=base-files libc libgcc busybox dropbear mtd uci opkg bash wget curl block-mount fdisk lsblk bind-client netifd fstools uclient-fetch logd urandom-seed urngd
+ # For nas targets
+ DEFAULT_PACKAGES.nas:=block-mount fdisk lsblk mdadm
+ # For router targets
+diff --git a/include/version.mk b/include/version.mk
+index 7c2d92a833..1677464a3f 100644
+--- a/include/version.mk
++++ b/include/version.mk
+@@ -32,7 +32,7 @@ VERSION_CODE:=$(call qstrip,$(CONFIG_VERSION_CODE))
+ VERSION_CODE:=$(if $(VERSION_CODE),$(VERSION_CODE),r11306-c4a6851c72)
+ 
+ VERSION_REPO:=$(call qstrip,$(CONFIG_VERSION_REPO))
+-VERSION_REPO:=$(if $(VERSION_REPO),$(VERSION_REPO),http://downloads.openwrt.org/releases/19.07.7)
++VERSION_REPO:=$(if $(VERSION_REPO),$(VERSION_REPO),https://mirrors.cloud.tencent.com/openwrt/releases/19.07.7)
+ 
+ VERSION_DIST:=$(call qstrip,$(CONFIG_VERSION_DIST))
+ VERSION_DIST:=$(if $(VERSION_DIST),$(VERSION_DIST),OpenWrt)
+diff --git a/package/base-files/Makefile b/package/base-files/Makefile
+index f2af97f7e6..dcf62a58f4 100644
+--- a/package/base-files/Makefile
++++ b/package/base-files/Makefile
+@@ -81,9 +81,9 @@ define ImageConfigOptions
+ 	echo 'pi_init_cmd=$(if $(CONFIG_TARGET_INIT_CMD),$(CONFIG_TARGET_INIT_CMD),"/sbin/init")' >>$(1)/lib/preinit/00_preinit.conf
+ 	echo 'pi_init_suppress_stderr="$(CONFIG_TARGET_INIT_SUPPRESS_STDERR)"' >>$(1)/lib/preinit/00_preinit.conf
+ 	echo 'pi_ifname=$(if $(CONFIG_TARGET_PREINIT_IFNAME),$(CONFIG_TARGET_PREINIT_IFNAME),"")' >>$(1)/lib/preinit/00_preinit.conf
+-	echo 'pi_ip=$(if $(CONFIG_TARGET_PREINIT_IP),$(CONFIG_TARGET_PREINIT_IP),"192.168.1.1")' >>$(1)/lib/preinit/00_preinit.conf
++	echo 'pi_ip=$(if $(CONFIG_TARGET_PREINIT_IP),$(CONFIG_TARGET_PREINIT_IP),"192.168.33.1")' >>$(1)/lib/preinit/00_preinit.conf
+ 	echo 'pi_netmask=$(if $(CONFIG_TARGET_PREINIT_NETMASK),$(CONFIG_TARGET_PREINIT_NETMASK),"255.255.255.0")' >>$(1)/lib/preinit/00_preinit.conf
+-	echo 'pi_broadcast=$(if $(CONFIG_TARGET_PREINIT_BROADCAST),$(CONFIG_TARGET_PREINIT_BROADCAST),"192.168.1.255")' >>$(1)/lib/preinit/00_preinit.conf
++	echo 'pi_broadcast=$(if $(CONFIG_TARGET_PREINIT_BROADCAST),$(CONFIG_TARGET_PREINIT_BROADCAST),"192.168.33.255")' >>$(1)/lib/preinit/00_preinit.conf
+ 	echo 'pi_preinit_net_messages="$(CONFIG_TARGET_PREINIT_SHOW_NETMSG)"' >>$(1)/lib/preinit/00_preinit.conf
+ 	echo 'pi_preinit_no_failsafe_netmsg="$(CONFIG_TARGET_PREINIT_SUPPRESS_FAILSAFE_NETMSG)"' >>$(1)/lib/preinit/00_preinit.conf
+ 	echo 'pi_preinit_no_failsafe="$(CONFIG_TARGET_PREINIT_DISABLE_FAILSAFE)"' >>$(1)/lib/preinit/00_preinit.conf
+diff --git a/package/base-files/files/bin/config_generate b/package/base-files/files/bin/config_generate
+index 3bf48d7216..3fa20f3493 100755
+--- a/package/base-files/files/bin/config_generate
++++ b/package/base-files/files/bin/config_generate
+@@ -100,7 +100,7 @@ generate_network() {
+ 		static)
+ 			local ipad
+ 			case "$1" in
+-				lan) ipad=${ipaddr:-"192.168.1.1"} ;;
++				lan) ipad=${ipaddr:-"192.168.33.1"} ;;
+ 				*) ipad=${ipaddr:-"192.168.$((addr_offset++)).1"} ;;
+ 			esac
+ 
+@@ -241,8 +241,9 @@ generate_static_system() {
+ 	uci -q batch <<-EOF
+ 		delete system.@system[0]
+ 		add system system
+-		set system.@system[-1].hostname='OpenWrt'
+-		set system.@system[-1].timezone='UTC'
++		set system.@system[-1].hostname='router'
++		set system.@system[-1].timezone='CST-8'
++		set system.@system[-1].zonename='Asia/Shanghai'
+ 		set system.@system[-1].ttylogin='0'
+ 		set system.@system[-1].log_size='64'
+ 		set system.@system[-1].urandom_seed='0'
+@@ -251,10 +252,10 @@ generate_static_system() {
+ 		set system.ntp='timeserver'
+ 		set system.ntp.enabled='1'
+ 		set system.ntp.enable_server='0'
+-		add_list system.ntp.server='0.openwrt.pool.ntp.org'
+-		add_list system.ntp.server='1.openwrt.pool.ntp.org'
+-		add_list system.ntp.server='2.openwrt.pool.ntp.org'
+-		add_list system.ntp.server='3.openwrt.pool.ntp.org'
++		add_list system.ntp.server='ntp1.aliyun.com'
++		add_list system.ntp.server='time1.cloud.tencent.com'
++		add_list system.ntp.server='time.ustc.edu.cn'
++		add_list system.ntp.server='cn.pool.ntp.org'
+ 	EOF
+ 
+ 	if json_is_a system object; then
+diff --git a/package/base-files/files/etc/banner b/package/base-files/files/etc/banner
+index f3af3c014f..12ee48b3d1 100644
+--- a/package/base-files/files/etc/banner
++++ b/package/base-files/files/etc/banner
+@@ -4,5 +4,5 @@
+  |_______||   __|_____|__|__||________||__|  |____|
+           |__| W I R E L E S S   F R E E D O M
+  -----------------------------------------------------
+- %D %V, %C
++ %D %V, %C神雕固件 千锤百炼
+  -----------------------------------------------------
+diff --git a/package/base-files/files/etc/nginx/conf.d/vhost.conf b/package/base-files/files/etc/nginx/conf.d/vhost.conf
+new file mode 100755
+index 0000000000..17496bcf8a
+--- /dev/null
++++ b/package/base-files/files/etc/nginx/conf.d/vhost.conf
+@@ -0,0 +1,13 @@
++server {
++        listen       8082;
++        server_name  localhost;
++        root  /mnt/sda1/web;
++        index  index.html index.htm index.php default.php;
++        error_page   500 502 503 504  /50x.html;
++	location / {
++		autoindex on;
++		autoindex_exact_size off;
++		autoindex_localtime on;
++		charset utf-8,gbk;
++        }
++}
+diff --git a/package/base-files/files/etc/passwd b/package/base-files/files/etc/passwd
+index 1d06a80361..c3a083d7c9 100644
+--- a/package/base-files/files/etc/passwd
++++ b/package/base-files/files/etc/passwd
+@@ -1,4 +1,4 @@
+-root:x:0:0:root:/root:/bin/ash
++root:x:0:0:root:/root:/bin/bash
+ daemon:*:1:1:daemon:/var:/bin/false
+ ftp:*:55:55:ftp:/home/ftp:/bin/false
+ network:*:101:101:network:/var:/bin/false
+diff --git a/package/base-files/files/etc/rc.local b/package/base-files/files/etc/rc.local
+index 56394773c3..3a29610203 100644
+--- a/package/base-files/files/etc/rc.local
++++ b/package/base-files/files/etc/rc.local
+@@ -1,4 +1,16 @@
+ # Put your custom commands here that should be executed once
+ # the system init finished. By default this file does nothing.
+-
++#dd if=/dev/zero of=iscsi.img count=0 obs=1 seek=50G
++#tgtadm --lld iscsi --op new --mode logicalunit --tid 3 --lun 1 -b /mnt/sda1/iscsi-windows.img
++#tgtadm --lld iscsi --op show --mode target
++#sed -i 's_downloads.openwrt.org_mirrors.ustc.edu.cn/openwrt_' /etc/opkg/distfeeds.conf
++#echo "#0 4 * * * reboot" > /etc/crontabs/root
++if [ -f /mnt/sda1/router/settings.sh ]; then
++	echo "配置新的settings脚本中"
++	cp -a /mnt/sda1/router/settings.sh /etc/
++	chmod +x /etc/settings.sh > /dev/null
++	bash /etc/settings.sh
++else
++	echo "磁盘未挂载或者新的配置文件不存在"
++fi
+ exit 0
+diff --git a/package/base-files/files/etc/shadow b/package/base-files/files/etc/shadow
+index 4b4154f21f..5dc98d43d8 100644
+--- a/package/base-files/files/etc/shadow
++++ b/package/base-files/files/etc/shadow
+@@ -1,4 +1,4 @@
+-root::0:0:99999:7:::
++root:$1$V4UetPzk$CYXluq4wUazHjmCDBCqXF.:0:0:99999:7:::
+ daemon:*:0:0:99999:7:::
+ ftp:*:0:0:99999:7:::
+ network:*:0:0:99999:7:::
+diff --git a/package/base-files/image-config.in b/package/base-files/image-config.in
+index 3bed22d641..eae54c4257 100644
+--- a/package/base-files/image-config.in
++++ b/package/base-files/image-config.in
+@@ -76,7 +76,7 @@ config TARGET_PREINIT_IFNAME
+ config TARGET_PREINIT_IP
+ 	string
+ 	prompt "IP address for preinit network messages" if PREINITOPT
+-	default "192.168.1.1"
++	default "192.168.33.1"
+ 	help
+ 		IP address used to configure interface for preinit network
+ 		messages, including failsafe messages
+@@ -92,7 +92,7 @@ config TARGET_PREINIT_NETMASK
+ config TARGET_PREINIT_BROADCAST
+ 	string
+ 	prompt "Broadcast address for preinit network messages" if PREINITOPT
+-	default "192.168.1.255"
++	default "192.168.33.255"
+ 	help
+ 		Broadcast address to which to send preinit network messages, as
+ 		as failsafe messages
+@@ -183,7 +183,7 @@ if VERSIONOPT
+ 	config VERSION_REPO
+ 		string
+ 		prompt "Release repository"
+-		default "http://downloads.openwrt.org/releases/19.07.7"
++		default "https://mirrors.cloud.tencent.com/openwrt/releases/19.07.7"
+ 		help
+ 			This is the repository address embedded in the image, it defaults
+ 			to the trunk snapshot repo; the url may contain the following placeholders:
+diff --git a/package/kernel/linux/files/sysctl-nf-conntrack.conf b/package/kernel/linux/files/sysctl-nf-conntrack.conf
+index 37baf5fd6f..558154d73a 100644
+--- a/package/kernel/linux/files/sysctl-nf-conntrack.conf
++++ b/package/kernel/linux/files/sysctl-nf-conntrack.conf
+@@ -3,7 +3,7 @@
+ 
+ net.netfilter.nf_conntrack_acct=1
+ net.netfilter.nf_conntrack_checksum=0
+-net.netfilter.nf_conntrack_max=16384
++net.netfilter.nf_conntrack_max=65536
+ net.netfilter.nf_conntrack_tcp_timeout_established=7440
+ net.netfilter.nf_conntrack_udp_timeout=60
+ net.netfilter.nf_conntrack_udp_timeout_stream=180
+diff --git a/package/network/config/firewall/files/firewall.config b/package/network/config/firewall/files/firewall.config
+index 8874e9882c..9c5c533d5e 100644
+--- a/package/network/config/firewall/files/firewall.config
++++ b/package/network/config/firewall/files/firewall.config
+@@ -129,6 +129,43 @@ config rule
+ 	option proto		udp
+ 	option target		ACCEPT
+ 
++config rule
++	option name		http8080
++	option proto		tcp
++	option dest_port	8080
++	option target		ACCEPT
++	option src		wan
++
++config rule
++	option name		http80
++	option proto		tcp
++	option dest_port	80
++	option target		ACCEPT
++	option src		wan
++
++config rule
++	option name		ssh8022
++	option proto		tcp
++	option dest_port	8022
++	option target		ACCEPT
++	option src		wan
++
++config rule
++	option name		ftp21
++	option proto		tcp
++	option dest_port	21
++	option target		ACCEPT
++	option src		wan
++	
++config redirect
++	option target		DNAT
++	option name		ssh
++	option src		wan
++	option src_dport	8022
++	option dest		lan
++	option dest_ip		192.168.33.1
++	option dest_port	22
++		
+ # include a file with users custom iptables rules
+ config include
+ 	option path /etc/firewall.user
+diff --git a/package/network/services/dropbear/files/dropbear.config b/package/network/services/dropbear/files/dropbear.config
+index 2139ba0bbe..a6c1dc4201 100644
+--- a/package/network/services/dropbear/files/dropbear.config
++++ b/package/network/services/dropbear/files/dropbear.config
+@@ -2,4 +2,5 @@ config dropbear
+ 	option PasswordAuth 'on'
+ 	option RootPasswordAuth 'on'
+ 	option Port         '22'
++	option Interface	'lan'
+ #	option BannerFile   '/etc/banner'
+diff --git a/package/network/services/samba36/files/samba.config b/package/network/services/samba36/files/samba.config
+index c79db0d322..3d5396c715 100644
+--- a/package/network/services/samba36/files/samba.config
++++ b/package/network/services/samba36/files/samba.config
+@@ -1,6 +1,6 @@
+ config samba
+-	option 'name'			'OpenWrt'
++	option 'name'			'router'
+ 	option 'workgroup'		'WORKGROUP'
+-	option 'description'		'OpenWrt'
++	option 'description'		'router'
+ 	option 'homes'			'1'
+ 
+diff --git a/package/system/fstools/Makefile b/package/system/fstools/Makefile
+index d5f44893c2..0cc4927cc2 100644
+--- a/package/system/fstools/Makefile
++++ b/package/system/fstools/Makefile
+@@ -110,6 +110,7 @@ define Package/block-mount/install
+ 	$(INSTALL_BIN) ./files/fstab.init $(1)/etc/init.d/fstab
+ 	$(INSTALL_CONF) ./files/fstab.default $(1)/etc/uci-defaults/10-fstab
+ 	$(INSTALL_CONF) ./files/mount.hotplug $(1)/etc/hotplug.d/block/10-mount
++	$(INSTALL_DATA) ./files/10-auto-mount $(1)/etc/hotplug.d/block/10-auto-mount
+ 	$(INSTALL_CONF) ./files/media-change.hotplug  $(1)/etc/hotplug.d/block/00-media-change
+ 
+ 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/sbin/block $(1)/sbin/
+diff --git a/package/system/fstools/files/10-auto-mount b/package/system/fstools/files/10-auto-mount
+new file mode 100644
+index 0000000000..a2f2353e5b
+--- /dev/null
++++ b/package/system/fstools/files/10-auto-mount
+@@ -0,0 +1,85 @@
++#!/bin/sh
++
++set_fstab(){
++
++	my_fstype="`block info | grep "/dev/$device" | awk -F 'TYPE="' '{print $2}' | sed 's/\"//'`"
++	
++	[ -n "$my_fstype" ] && {
++		logger -t Auto-Mount "New block.File system:${my_fstype}"
++		if [ "$my_fstype" = 'swap' ]; then
++			
++			n=$(uci show fstab | grep "fstab.@swap" | grep -c "=swap")
++			
++			[ $n -gt 0 ] && {
++				for i in $(seq 0 $n)
++				do
++					old_swap="$(uci get fstab.@swap[$i].device)"
++					[ "$old_swap" = "/dev/$device" ] && {
++						FLAG="SKIP"
++						break
++					}
++				done
++			}
++
++			[ "$FLAG" != "SKIP" ] && {
++				uci add fstab swap
++				uci set fstab.@swap[$n]="swap"
++				uci set fstab.@swap[$n].enabled='1'
++				uci set fstab.@swap[$n].device="/dev/$device"
++			}
++
++		else
++			
++			section=$(echo $get_uuid | sed 's/-//g')
++
++			uci set fstab.${section}="mount"
++			uci set fstab.${section}.enabled=1
++			uci set fstab.${section}.uuid="${get_uuid}"
++			uci set fstab.${section}.target="/mnt/$device"
++			uci set fstab.${section}.fstype="$my_fstype"
++
++			case "$my_fstype" in
++				ext*)
++					uci set fstab.${section}.options="noatime";;
++				'ntfs')
++				if [ $(lsmod | grep -c ufsd) -ge 1 ]
++				then
++					uci set fstab.${section}.fstype="ufsd"
++					uci set fstab.${section}.options="noatime,nls=utf8,force"
++				else
++					uci set fstab.${section}.fstype="ntfs-3g"
++					uci set fstab.${section}.options="noatime,iocharset=utf8,big_writes"
++				fi
++				;;
++				'exfat')
++					uci set fstab.${section}.options="noatime";;
++				'vfat')
++					uci set fstab.${section}.options="iocharset=utf8,umask=0000,dmask=0000,fmask=0000";;
++                *)
++                    uci set fstab.${section}.enabled=0;;
++			esac
++		fi
++		uci commit fstab
++	}
++}
++
++blkdev=`dirname $DEVPATH`
++if [ `basename $blkdev` != "block" ]; then
++
++    device=`basename $DEVPATH`
++    mountpoint=`sed -ne "s|^[^ ]*/$device ||; T; s/ .*//p" /proc/self/mounts`
++
++    case "$ACTION" in
++	add)
++		get_uuid=`block info | grep "/dev/${device}" | awk -F "UUID=" '{print $2}'| awk -F "\"" '{print $2}'`
++		[ -n "$get_uuid" ] && {
++			logger -t Auto-Mount "Block /dev/${device} added."
++			logger -t Auto-Mount "UUID=$get_uuid"
++			have_uuid=$(uci show fstab | grep -c "$get_uuid")
++			[ "$have_uuid" = "0" ] && set_fstab
++        		mkdir -p /mnt/$device
++		}
++		;;
++    esac	
++
++fi
+diff --git a/scripts/download.pl b/scripts/download.pl
+index 2876ae5807..1370499e78 100755
+--- a/scripts/download.pl
++++ b/scripts/download.pl
+@@ -235,6 +235,7 @@ foreach my $mirror (@ARGV) {
+ 			push @extra, "$extra[0]/longterm/v$1";
+ 		}		
+ 		foreach my $dir (@extra) {
++			push @mirrors, "https://mirrors.ustc.edu.cn/kernel.org/$dir";
+ 			push @mirrors, "https://cdn.kernel.org/pub/$dir";
+ 			push @mirrors, "https://mirror.rackspace.com/kernel.org/$dir";
+ 			push @mirrors, "http://download.xs4all.nl/ftp.kernel.org/pub/$dir";
+-- 
+2.25.1
+
