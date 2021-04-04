@@ -1,12 +1,17 @@
 #
 # This is free software, license use GPLv3.
 #
-# Copyright (c) 2020, Chuck <fanck0605@qq.com>
+# Copyright (c) 2020
 #
 
 name: openwrt-dragino2
 
 env:
+  UPLOAD_RELEASE: true
+  UPLOAD_FIRMWARE: false
+  UPLOAD_BIN_DIR: false
+  REMOVE_OLD_RELEASE: false
+  REMOVE_WORKFLOW_RUNS: true
   TZ: Asia/Shanghai
 
 on:
@@ -46,6 +51,7 @@ jobs:
           sudo timedatectl set-timezone "$TZ"
           git config --global user.name "GitHub"
           git config --global user.email "noreply@github.com"
+          echo "## $(date +"%Y%m%d")-dragino2" > update_log.txt
           df -h
 
       - name: Build OpenWrt
@@ -66,24 +72,20 @@ jobs:
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
+        if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
         with:
           name: ${{ steps.assemble_artifact.outputs.artifact_name }}
           path: artifact
-          
-      - name: Generate release tag
-        id: tag
-        run: |
-          echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")"
-          echo "::set-output name=status::success"
 
       - name: Upload firmware to release
         uses: softprops/action-gh-release@v1
-        if: steps.tag.outputs.status == 'success' && !cancelled()
+        if: env.UPLOAD_RELEASE == 'true' && !cancelled()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.tag.outputs.release_tag }}
-          files: artifact/*
+          tag_name: AutoUpdate
+          body_path: update_log.txt
+          files: openwrt/bin/*
 
       - name: Delete workflow runs
         uses: GitRML/delete-workflow-runs@main
