@@ -39,7 +39,7 @@ done
 cd "$proj_dir/openwrt"
 Compile_Date=$(date +%Y%m%d)
 AB_Firmware_Info=package/base-files/files/etc/openwrt_info
-Openwrt_Version="19.7.07-${Compile_Date}"
+Openwrt_Version="R19.7.07-${Compile_Date}"
 Owner_Repo="https://github.com/slitaz-cn/dragino2-19.07.7"
 TARGET_PROFILE="dragino2"
 Firmware_Type="bin"
