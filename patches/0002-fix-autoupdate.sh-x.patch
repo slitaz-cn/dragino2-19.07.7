@@ -1,0 +1,17 @@
+From 988b1281ccfc52e5d25b66cf2f6d3f18e2f43f30 Mon Sep 17 00:00:00 2001
+From: slitaz-cn <teasiu@163.com>
+Date: Mon, 5 Apr 2021 16:30:56 +0800
+Subject: [PATCH 2/2] fix autoupdate.sh +x
+
+Signed-off-by: slitaz-cn <teasiu@163.com>
+---
+ package/base-files/files/bin/AutoUpdate.sh | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ mode change 100644 => 100755 package/base-files/files/bin/AutoUpdate.sh
+
+diff --git a/package/base-files/files/bin/AutoUpdate.sh b/package/base-files/files/bin/AutoUpdate.sh
+old mode 100644
+new mode 100755
+-- 
+2.20.1
+

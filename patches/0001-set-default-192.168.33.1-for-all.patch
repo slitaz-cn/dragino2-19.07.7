@@ -1,7 +1,7 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From 645f8f9d7a2bd52ad0b0f5617487f826b110bae1 Mon Sep 17 00:00:00 2001
 From: slitaz-cn <teasiu@163.com>
 Date: Mon, 5 Apr 2021 13:28:29 +0800
-Subject: [PATCH] set default 192.168.33.1 for all
+Subject: [PATCH 1/2] set default 192.168.33.1 for all
 
 Signed-off-by: slitaz-cn <teasiu@163.com>
 ---
