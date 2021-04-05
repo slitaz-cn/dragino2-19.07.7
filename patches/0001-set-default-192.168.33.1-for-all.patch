@@ -1,56 +1,49 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: slitaz-cn <teasiu@163.com>
-Date: Thu, 1 Apr 2021 11:26:39 +0800
-Subject: [PATCH] set dragino2 luci nginx as default
+Date: Mon, 5 Apr 2021 13:28:29 +0800
+Subject: [PATCH] set default 192.168.33.1 for all
 
 Signed-off-by: slitaz-cn <teasiu@163.com>
 ---
- feeds.conf.default                            |  2 +-
- include/target.mk                             |  2 +-
- include/version.mk                            |  2 +-
- package/base-files/Makefile                   |  4 +-
- package/base-files/files/bin/config_generate  | 15 ++--
- package/base-files/files/etc/banner           |  2 +-
- .../files/etc/nginx/conf.d/vhost.conf         | 13 +++
- package/base-files/files/etc/passwd           |  2 +-
- package/base-files/files/etc/rc.local         | 14 ++-
- package/base-files/files/etc/shadow           |  2 +-
- package/base-files/image-config.in            |  6 +-
- .../linux/files/sysctl-nf-conntrack.conf      |  2 +-
- .../config/firewall/files/firewall.config     | 37 ++++++++
- .../services/dropbear/files/dropbear.config   |  1 +
- .../services/samba36/files/samba.config       |  4 +-
- package/system/fstools/Makefile               |  1 +
- package/system/fstools/files/10-auto-mount    | 85 +++++++++++++++++++
- scripts/download.pl                           |  1 +
- 18 files changed, 173 insertions(+), 22 deletions(-)
- create mode 100755 package/base-files/files/etc/nginx/conf.d/vhost.conf
+ include/target.mk                             |   5 +-
+ include/version.mk                            |   2 +-
+ package/base-files/Makefile                   |   4 +-
+ package/base-files/files/bin/AutoUpdate.sh    | 310 ++++++++++++++++++
+ package/base-files/files/bin/config_generate  |  13 +-
+ package/base-files/files/etc/banner           |   2 +-
+ package/base-files/files/etc/passwd           |   2 +-
+ package/base-files/files/etc/rc.local         |  14 +-
+ package/base-files/files/etc/shadow           |   2 +-
+ package/base-files/image-config.in            |   6 +-
+ .../linux/files/sysctl-nf-conntrack.conf      |   2 +-
+ .../config/firewall/files/firewall.config     |  39 +++
+ .../services/dropbear/files/dropbear.config   |   1 +
+ package/system/fstools/Makefile               |   1 +
+ package/system/fstools/files/10-auto-mount    |  85 +++++
+ scripts/download.pl                           |   1 +
+ 16 files changed, 470 insertions(+), 19 deletions(-)
+ create mode 100644 package/base-files/files/bin/AutoUpdate.sh
  create mode 100644 package/system/fstools/files/10-auto-mount
 
-diff --git a/feeds.conf.default b/feeds.conf.default
-index 841430159c..047c789bfa 100644
---- a/feeds.conf.default
-+++ b/feeds.conf.default
-@@ -1,5 +1,5 @@
- src-git packages https://git.openwrt.org/feed/packages.git^90af10d01579425369bd474051b6d3ddaf32a7e3
--src-git luci https://git.openwrt.org/project/luci.git^34e0d656a41befd9720be35c4831c9f136a67c59
-+src-git luci https://git.openwrt.org/project/luci.git^7456e2a
- src-git routing https://git.openwrt.org/feed/routing.git^e26b4745209655976b7d124465b1dc53ade632f9
- src-git telephony https://git.openwrt.org/feed/telephony.git^6e019c94d0fa7162548d528bf4ba060a61f8cb59
- src-git freifunk https://github.com/freifunk/openwrt-packages.git^c621a4283870fe062489fe5e26a15deda7ef4ed7
 diff --git a/include/target.mk b/include/target.mk
-index 7b0e92fce8..5e89bfd0f4 100644
+index 7b0e92fce8..5e8e181908 100644
 --- a/include/target.mk
 +++ b/include/target.mk
-@@ -13,7 +13,7 @@ __target_inc=1
+@@ -13,11 +13,12 @@ __target_inc=1
  DEVICE_TYPE?=router
  
  # Default packages - the really basic set
 -DEFAULT_PACKAGES:=base-files libc libgcc busybox dropbear mtd uci opkg netifd fstools uclient-fetch logd urandom-seed urngd
-+DEFAULT_PACKAGES:=base-files libc libgcc busybox dropbear mtd uci opkg bash wget curl block-mount fdisk lsblk bind-client netifd fstools uclient-fetch logd urandom-seed urngd
++DEFAULT_PACKAGES:=base-files libc libgcc busybox dropbear mtd uci opkg bash wget curl block-mount fdisk lsblk bind-client \
++				netifd fstools uclient-fetch logd urandom-seed urngd
  # For nas targets
  DEFAULT_PACKAGES.nas:=block-mount fdisk lsblk mdadm
  # For router targets
+-DEFAULT_PACKAGES.router:=dnsmasq iptables ip6tables ppp ppp-mod-pppoe firewall odhcpd-ipv6only odhcp6c kmod-ipt-offload
++DEFAULT_PACKAGES.router:=dnsmasq-full iptables ip6tables ppp ppp-mod-pppoe firewall odhcpd-ipv6only odhcp6c kmod-ipt-offload
+ DEFAULT_PACKAGES.bootloader:=
+ 
+ ifneq ($(DUMP),)
 diff --git a/include/version.mk b/include/version.mk
 index 7c2d92a833..1677464a3f 100644
 --- a/include/version.mk
@@ -80,8 +73,325 @@ index f2af97f7e6..dcf62a58f4 100644
  	echo 'pi_preinit_net_messages="$(CONFIG_TARGET_PREINIT_SHOW_NETMSG)"' >>$(1)/lib/preinit/00_preinit.conf
  	echo 'pi_preinit_no_failsafe_netmsg="$(CONFIG_TARGET_PREINIT_SUPPRESS_FAILSAFE_NETMSG)"' >>$(1)/lib/preinit/00_preinit.conf
  	echo 'pi_preinit_no_failsafe="$(CONFIG_TARGET_PREINIT_DISABLE_FAILSAFE)"' >>$(1)/lib/preinit/00_preinit.conf
+diff --git a/package/base-files/files/bin/AutoUpdate.sh b/package/base-files/files/bin/AutoUpdate.sh
+new file mode 100644
+index 0000000000..e2be38b461
+--- /dev/null
++++ b/package/base-files/files/bin/AutoUpdate.sh
+@@ -0,0 +1,310 @@
++#!/bin/bash
++# https://github.com/Hyy2001X/AutoBuild-Actions
++# AutoBuild Module by Hyy2001
++# AutoUpdate for Openwrt
++
++Version=V5.5
++
++Shell_Helper() {
++	echo -e "\n使用方法: bash /bin/AutoUpdate.sh [参数1] [参数2]"
++	echo -e "\n支持下列参数:\n"
++	echo "	-q	更新固件,不打印备份信息日志 [保留配置]"
++	echo "	-n	更新固件 [不保留配置]"
++	echo "	-f	强制更新固件,即跳过版本号验证,自动下载以及安装必要软件包 [保留配置]"
++	echo "	-u	适用于定时更新 LUCI 的参数 [保留配置]"
++	echo "	-c	[参数2:<Github 地址>] 更换 Github 检查更新以及固件下载地址"
++	echo "	-b	[参数2:<引导方式 UEFI/Legacy>] 指定 x86 设备下载使用 UEFI/Legacy 引导的固件 [危险]"
++	echo "	-l	列出所有信息"
++	echo "	-d	清除固件下载缓存"
++	echo -e "	-h	打印帮助信息\n"
++	exit
++}
++
++List_Info() {
++	echo -e "\n/overlay 可用:	${Overlay_Available}"
++	echo "/tmp 可用:	${TMP_Available}M"
++	echo "固件下载位置:	/tmp/Downloads"
++	echo "当前设备:	${CURRENT_Device}"
++	echo "默认设备:	${DEFAULT_Device}"
++	echo "当前固件版本:	${CURRENT_Version}"
++	echo "固件名称:	AutoBuild-${CURRENT_Device}-${CURRENT_Version}${Firmware_SFX}"
++	echo "Github 地址:	${Github}"
++	echo "解析 API 地址:	${Github_Tags}"
++	echo "固件下载地址:	${Github_Download}"
++	echo "作者/仓库:	${Author}"
++	if [[ ${DEFAULT_Device} == "x86_64" ]];then
++		echo "EFI 引导: 	${EFI_Boot}"
++		echo "固件压缩:	${Compressed_x86}"
++	fi
++	echo "固件格式:	${Firmware_SFX}"
++	exit
++}
++
++Install_Pkg() {
++	PKG_NAME=${1}
++	grep "${PKG_NAME}" /tmp/Package_list > /dev/null 2>&1
++	if [[ $? -ne 0 ]];then
++		if [[ "${Force_Update}" == "1" ]] || [[ "${AutoUpdate_Mode}" == "1" ]];then
++			Choose="Y"
++		else
++			TIME && read -p "未安装[${PKG_NAME}],是否执行安装?[Y/n]:" Choose
++		fi
++		if [[ "${Choose}" == Y ]] || [[ "${Choose}" == y ]];then
++			TIME && echo -e "开始安装[${PKG_NAME}],请耐心等待...\n"
++			opkg update > /dev/null 2>&1
++			opkg install ${PKG_NAME}
++			if [[ $? -ne 0 ]];then
++				TIME && echo "[${PKG_NAME}] 安装失败,请尝试手动安装!"
++				exit
++			else
++				TIME && echo "[${PKG_NAME}] 安装成功!"
++			fi
++		else
++			TIME && echo "用户已取消安装,即将退出更新脚本..."
++			sleep 2
++			exit
++		fi
++	fi
++}
++
++TIME() {
++	echo -ne "\n[$(date "+%H:%M:%S")] "
++}
++
++opkg list | awk '{print $1}' > /tmp/Package_list
++Input_Option="$1"
++Input_Other="$2"
++CURRENT_Version="$(awk 'NR==1' /etc/openwrt_info)"
++Github="$(awk 'NR==2' /etc/openwrt_info)"
++Github_Download="${Github}/releases/download/AutoUpdate"
++Author="${Github##*com/}"
++Github_Tags="https://api.github.com/repos/${Author}/releases/latest"
++DEFAULT_Device="$(awk 'NR==3' /etc/openwrt_info)"
++Firmware_Type="$(awk 'NR==4' /etc/openwrt_info)"
++TMP_Available="$(df -m | grep "/tmp" | awk '{print $4}' | awk 'NR==1' | awk -F. '{print $1}')"
++Overlay_Available="$(df -h | grep ":/overlay" | awk '{print $4}' | awk 'NR==1')"
++case ${DEFAULT_Device} in
++x86_64)
++	[[ -z ${Firmware_Type} ]] && Firmware_Type="img"
++	if [[ "${Firmware_Type}" == "img.gz" ]];then
++		Compressed_x86="1"
++	else
++		Compressed_x86="0"
++	fi
++	if [ -f /etc/openwrt_boot ];then
++		BOOT_Type="-$(cat /etc/openwrt_boot)"
++	else
++		if [ -d /sys/firmware/efi ];then
++			BOOT_Type="-UEFI"
++		else
++			BOOT_Type="-Legacy"
++		fi
++	fi
++	case "${BOOT_Type}" in
++	-Legacy)
++		EFI_Boot=0
++	;;
++	-UEFI)
++		EFI_Boot=1
++	;;
++	esac
++	Firmware_SFX="${BOOT_Type}.${Firmware_Type}"
++	Detail_SFX="${BOOT_Type}.detail"
++	CURRENT_Device="x86_64"
++	Space_Req=480
++;;
++*)
++	CURRENT_Device="$(jsonfilter -e '@.model.id' < /etc/board.json | tr ',' '_')"
++	Firmware_SFX=".${Firmware_Type}"
++	[[ -z ${Firmware_SFX} ]] && Firmware_SFX=".bin"
++	Detail_SFX=".detail"
++	Space_Req=0
++esac
++cd /etc
++clear && echo "Openwrt-AutoUpdate Script ${Version}"
++if [[ -z "${Input_Option}" ]];then
++	Upgrade_Options="-q" && TIME && echo "执行: 保留配置更新固件[静默模式]"
++else
++	case ${Input_Option} in
++	-n | -f | -u)
++		case ${Input_Option} in
++		-n)
++			TIME && echo "执行: 更新固件(不保留配置)"
++			Upgrade_Options="-n"
++		;;
++		-f)
++			Force_Update=1
++			Upgrade_Options="-q"
++			TIME && echo "执行: 强制更新固件(保留配置)"
++		;;
++		-u)
++			AutoUpdate_Mode=1
++			Upgrade_Options="-q"
++		;;
++		esac
++	;;
++	-c)
++		if [[ ! -z "${Input_Other}" ]];then
++			sed -i "s?${Github}?${Input_Other}?g" /etc/openwrt_info > /dev/null 2>&1
++			echo -e "\nGithub 地址已更换为: ${Input_Other}"
++			unset Input_Other
++		else
++			Shell_Helper
++		fi
++		exit
++	;;
++	-l | -L)
++		List_Info
++	;;
++	-d)
++		rm -f /tmp/Downloads/* /tmp/Github_Tags
++		TIME && echo "固件下载缓存清理完成!"
++		sleep 1
++		exit
++	;;
++	-h | -H | --help)
++		Shell_Helper
++	;;
++	-b)
++		[[ -z "${Input_Other}" ]] && Shell_Helper
++		case "${Input_Other}" in
++		UEFI | Legacy)
++			echo "${Input_Other}" > openwrt_boot
++			sed -i '/openwrt_boot/d' /etc/sysupgrade.conf
++			echo -e "\n/etc/openwrt_boot" >> /etc/sysupgrade.conf
++			TIME && echo "固件引导方式已指定为: ${Input_Other}!"
++		;;
++		*)
++			echo -e "\n错误的参数: [${Input_Other}],当前支持的选项: [UEFI/Legacy] !"
++		;;
++		esac
++		exit
++	;;
++	*)
++		echo -e "\nERROR INPUT: [$*]"
++		Shell_Helper
++	;;
++	esac
++fi
++if [[ ! "${Force_Update}" == "1" ]];then
++	grep "curl" /tmp/Package_list > /dev/null 2>&1
++	if [[ ! $? -ne 0 ]];then
++		Google_Check=$(curl -I -s --connect-timeout 3 google.com -w %{http_code} | tail -n1)
++		if [ ! "$Google_Check" == 301 ];then
++			TIME && echo "Google 连接失败,尝试使用 [FastGit] 镜像加速!"
++			PROXY_URL="https://download.fastgit.org"
++		fi
++	fi
++	if [[ "${TMP_Available}" -lt "${Space_Req}" ]];then
++		TIME && echo "/tmp 空间不足: [${Space_Req}M],无法执行更新!"
++		exit
++	fi
++fi
++Install_Pkg wget
++if [[ -z "${CURRENT_Version}" ]];then
++	TIME && echo "警告: 当前固件版本获取失败!"
++	CURRENT_Version="未知"
++fi
++if [[ -z "${CURRENT_Device}" ]];then
++	[[ "${Force_Update}" == "1" ]] && exit
++	TIME && echo "警告: 当前设备名称获取失败,使用预设名称[$DEFAULT_Device]"
++	CURRENT_Device="${DEFAULT_Device}"
++fi
++TIME && echo "正在检查版本更新..."
++wget -q ${Github_Tags} -O - > /tmp/Github_Tags
++if [[ ! "$?" == 0 ]];then
++	TIME && echo "检查更新失败,请稍后重试!"
++	exit
++fi
++TIME && echo "正在获取云端固件版本..."
++GET_Firmware=$(cat /tmp/Github_Tags | egrep -o "AutoBuild-${CURRENT_Device}-R[0-9].+-[0-9]+${Firmware_SFX}" | awk 'END {print}')
++GET_Version=$(echo ${GET_Firmware} | egrep -o "R[0-9].+-[0-9]+")
++if [[ -z "${GET_Firmware}" ]] || [[ -z "${GET_Version}" ]];then
++	TIME && echo "云端固件版本获取失败!"
++	exit
++fi
++Firmware_Info="$(echo ${GET_Firmware} | egrep -o "AutoBuild-${CURRENT_Device}-R[0-9].+-[0-9]+")"
++Firmware="${GET_Firmware}"
++Firmware_Detail="${Firmware_Info}${Detail_SFX}"
++let X=$(grep -n "${Firmware}" /tmp/Github_Tags | tail -1 | cut -d : -f 1)-4
++let Cloud_Firmware_Size=$(sed -n "${X}p" /tmp/Github_Tags | egrep -o "[0-9]+" | awk '{print ($1)/1048576}' | awk -F. '{print $1}')+1
++echo -e "\n固件作者: ${Author%/*}"
++echo "设备名称: ${CURRENT_Device}"
++echo "固件格式: ${Firmware_SFX}"
++echo -e "\n当前固件版本: ${CURRENT_Version}"
++echo "云端固件版本: ${GET_Version}"
++echo "当前可用空间: ${TMP_Available}M"
++echo "云端固件大小: ${Cloud_Firmware_Size}M"
++if [[ ! ${Force_Update} == 1 ]];then
++	if [[ "${TMP_Available}" -lt "${Cloud_Firmware_Size}" ]];then
++		TIME && echo "/tmp 空间不足: [${Cloud_Firmware_Size}M],无法执行更新!"
++		exit
++	fi
++	if [[ ${CURRENT_Version} == ${GET_Version} ]];then
++		[[ "${AutoUpdate_Mode}" == "1" ]] && exit
++		TIME && read -p "已是最新版本,是否强制更新固件?[Y/n]:" Choose
++		if [[ "${Choose}" == Y ]] || [[ "${Choose}" == y ]];then
++			TIME && echo "开始强制更新固件..."
++		else
++			TIME && echo "已取消强制更新,即将退出更新程序..."
++			sleep 2
++			exit
++		fi
++	fi
++fi
++if [ ! -z "${PROXY_URL}" ];then
++	Github_Download=${PROXY_URL}/${Author}/releases/download/AutoUpdate
++fi
++echo -e "\n云端固件名称: ${Firmware}"
++echo "固件下载地址: ${Github_Download}"
++echo "固件保存位置: /tmp/Downloads"
++[ ! -d "/tmp/Downloads" ] && mkdir -p /tmp/Downloads
++rm -f /tmp/Downloads/*
++TIME && echo "正在下载固件,请耐心等待..."
++cd /tmp/Downloads
++wget -q "${Github_Download}/${Firmware}" -O ${Firmware}
++if [[ ! "$?" == 0 ]];then
++	TIME && echo "固件下载失败,请检查网络后重试!"
++	exit
++fi
++TIME && echo "固件下载成功!"
++TIME && echo "正在获取云端固件MD5,请耐心等待..."
++wget -q ${Github_Download}/${Firmware_Detail} -O ${Firmware_Detail}
++if [[ ! "$?" == 0 ]];then
++	TIME && echo "MD5 获取失败,请检查网络后重试!"
++	exit
++fi
++GET_MD5=$(awk -F '[ :]' '/MD5/ {print $2;exit}' ${Firmware_Detail})
++CURRENT_MD5=$(md5sum ${Firmware} | cut -d ' ' -f1)
++echo -e "\n本地固件MD5:${CURRENT_MD5}"
++echo "云端固件MD5:${GET_MD5}"
++if [[ -z "${GET_MD5}" ]] || [[ -z "${CURRENT_MD5}" ]];then
++	TIME && echo "MD5 获取失败!"
++	exit
++fi
++if [[ ! "${GET_MD5}" == "${CURRENT_MD5}" ]];then
++	TIME && echo "MD5 对比失败,请检查网络后重试!"
++	exit
++else
++	TIME && echo "MD5 对比通过!"
++fi
++if [[ ${Compressed_x86} == 1 ]];then
++	TIME && echo "检测到固件为 [.gz] 压缩格式,开始解压固件..."
++	Install_Pkg gzip
++	gzip -dk ${Firmware} > /dev/null 2>&1
++	Firmware="${Firmware_Info}${BOOT_Type}.img"
++	if [ -f "${Firmware}" ];then
++		TIME && echo "固件解压成功,名称: ${Firmware}"
++	else
++		TIME && echo "固件解压失败!"
++		exit
++	fi
++fi
++TIME && echo -e "一切准备就绪,3s 后开始更新固件..."
++sleep 3
++TIME && echo "正在更新固件,期间请耐心等待..."
++sysupgrade ${Upgrade_Options} ${Firmware}
++if [[ $? -ne 0 ]];then
++	TIME && echo "固件刷写失败,请尝试手动下载更新固件!"
++	exit
++fi
+\ No newline at end of file
 diff --git a/package/base-files/files/bin/config_generate b/package/base-files/files/bin/config_generate
-index 3bf48d7216..3fa20f3493 100755
+index 3bf48d7216..7fb677239a 100755
 --- a/package/base-files/files/bin/config_generate
 +++ b/package/base-files/files/bin/config_generate
 @@ -100,7 +100,7 @@ generate_network() {
@@ -93,13 +403,11 @@ index 3bf48d7216..3fa20f3493 100755
  				*) ipad=${ipaddr:-"192.168.$((addr_offset++)).1"} ;;
  			esac
  
-@@ -241,8 +241,9 @@ generate_static_system() {
- 	uci -q batch <<-EOF
+@@ -242,7 +242,8 @@ generate_static_system() {
  		delete system.@system[0]
  		add system system
--		set system.@system[-1].hostname='OpenWrt'
+ 		set system.@system[-1].hostname='OpenWrt'
 -		set system.@system[-1].timezone='UTC'
-+		set system.@system[-1].hostname='router'
 +		set system.@system[-1].timezone='CST-8'
 +		set system.@system[-1].zonename='Asia/Shanghai'
  		set system.@system[-1].ttylogin='0'
@@ -121,7 +429,7 @@ index 3bf48d7216..3fa20f3493 100755
  
  	if json_is_a system object; then
 diff --git a/package/base-files/files/etc/banner b/package/base-files/files/etc/banner
-index f3af3c014f..12ee48b3d1 100644
+index f3af3c014f..3ba2131c2a 100644
 --- a/package/base-files/files/etc/banner
 +++ b/package/base-files/files/etc/banner
 @@ -4,5 +4,5 @@
@@ -129,27 +437,8 @@ index f3af3c014f..12ee48b3d1 100644
            |__| W I R E L E S S   F R E E D O M
   -----------------------------------------------------
 - %D %V, %C
-+ %D %V, %C神雕固件 千锤百炼
++ %D %V, %C 神雕固件 千锤百炼
   -----------------------------------------------------
-diff --git a/package/base-files/files/etc/nginx/conf.d/vhost.conf b/package/base-files/files/etc/nginx/conf.d/vhost.conf
-new file mode 100755
-index 0000000000..17496bcf8a
---- /dev/null
-+++ b/package/base-files/files/etc/nginx/conf.d/vhost.conf
-@@ -0,0 +1,13 @@
-+server {
-+        listen       8082;
-+        server_name  localhost;
-+        root  /mnt/sda1/web;
-+        index  index.html index.htm index.php default.php;
-+        error_page   500 502 503 504  /50x.html;
-+	location / {
-+		autoindex on;
-+		autoindex_exact_size off;
-+		autoindex_localtime on;
-+		charset utf-8,gbk;
-+        }
-+}
 diff --git a/package/base-files/files/etc/passwd b/package/base-files/files/etc/passwd
 index 1d06a80361..c3a083d7c9 100644
 --- a/package/base-files/files/etc/passwd
@@ -237,20 +526,13 @@ index 37baf5fd6f..558154d73a 100644
  net.netfilter.nf_conntrack_udp_timeout=60
  net.netfilter.nf_conntrack_udp_timeout_stream=180
 diff --git a/package/network/config/firewall/files/firewall.config b/package/network/config/firewall/files/firewall.config
-index 8874e9882c..9c5c533d5e 100644
+index 8874e9882c..971cb915c1 100644
 --- a/package/network/config/firewall/files/firewall.config
 +++ b/package/network/config/firewall/files/firewall.config
-@@ -129,6 +129,43 @@ config rule
+@@ -129,6 +129,45 @@ config rule
  	option proto		udp
  	option target		ACCEPT
  
-+config rule
-+	option name		http8080
-+	option proto		tcp
-+	option dest_port	8080
-+	option target		ACCEPT
-+	option src		wan
-+
 +config rule
 +	option name		http80
 +	option proto		tcp
@@ -273,13 +555,22 @@ index 8874e9882c..9c5c533d5e 100644
 +	option src		wan
 +	
 +config redirect
-+	option target		DNAT
-+	option name		ssh
-+	option src		wan
++	option name			http
++	option src			wan
++	option src_dport	80
++	option dest			lan
++	option dest_ip		192.168.33.1
++	option dest_port	80
++	option proto		tcp
++
++config redirect
++	option name			ssh
++	option src			wan
 +	option src_dport	8022
-+	option dest		lan
++	option dest			lan
 +	option dest_ip		192.168.33.1
 +	option dest_port	22
++	option proto		tcp
 +		
  # include a file with users custom iptables rules
  config include
@@ -294,19 +585,6 @@ index 2139ba0bbe..a6c1dc4201 100644
  	option Port         '22'
 +	option Interface	'lan'
  #	option BannerFile   '/etc/banner'
-diff --git a/package/network/services/samba36/files/samba.config b/package/network/services/samba36/files/samba.config
-index c79db0d322..3d5396c715 100644
---- a/package/network/services/samba36/files/samba.config
-+++ b/package/network/services/samba36/files/samba.config
-@@ -1,6 +1,6 @@
- config samba
--	option 'name'			'OpenWrt'
-+	option 'name'			'router'
- 	option 'workgroup'		'WORKGROUP'
--	option 'description'		'OpenWrt'
-+	option 'description'		'router'
- 	option 'homes'			'1'
- 
 diff --git a/package/system/fstools/Makefile b/package/system/fstools/Makefile
 index d5f44893c2..0cc4927cc2 100644
 --- a/package/system/fstools/Makefile
@@ -423,5 +701,5 @@ index 2876ae5807..1370499e78 100755
  			push @mirrors, "https://mirror.rackspace.com/kernel.org/$dir";
  			push @mirrors, "http://download.xs4all.nl/ftp.kernel.org/pub/$dir";
 -- 
-2.25.1
+2.20.1
 
