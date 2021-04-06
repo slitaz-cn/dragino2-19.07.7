@@ -85,6 +85,10 @@ cd "$proj_dir/openwrt/package"
 find . -name .svn -exec rm -rf {} +
 find . -name .git -exec rm -rf {} +
 
+cd "$proj_dir/openwrt"
+rm -rf feeds/packages/lang/golang
+svn co https://github.com/coolsnowwolf/packages/trunk/lang/golang feeds/packages/lang/golang
+
 # zh_cn to zh_Hans
 cd "$proj_dir/openwrt/package"
 "$proj_dir/scripts/convert_translation.sh"
