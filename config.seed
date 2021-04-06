@@ -36,3 +36,12 @@ CONFIG_PACKAGE_badblocks=y
 CONFIG_PACKAGE_bash=y
 CONFIG_PACKAGE_openssl-util=y
 CONFIG_PACKAGE_usbutils=y
+
+CONFIG_PACKAGE_microsocks=y
+CONFIG_PACKAGE_pdnsd-alt=y
+CONFIG_PACKAGE_shadowsocks-libev-config=y
+CONFIG_PACKAGE_shadowsocks-libev-ss-local=y
+CONFIG_PACKAGE_shadowsocks-libev-ss-redir=y
+CONFIG_PACKAGE_shadowsocksr-libev-alt=y
+CONFIG_PACKAGE_shadowsocksr-libev-ssr-local=y
+CONFIG_PACKAGE_simple-obfs=y
