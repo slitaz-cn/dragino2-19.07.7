@@ -60,7 +60,7 @@ svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/simple-obfs custo
 svn co https://github.com/fw876/helloworld/trunk/tcping custom/tcping
 svn co https://github.com/fw876/helloworld/trunk/xray-core custom/xray-core
 svn co https://github.com/fw876/helloworld/trunk/xray-plugin custom/xray-plugin
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/shadowsocks-rust custom/shadowsocks-rust
+svn co https://github.com/fw876/helloworld/trunk/shadowsocks-rust custom/shadowsocks-rust
 svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/v2ray-plugin custom/v2ray-plugin
 svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/trojan custom/trojan
 svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/ipt2socks custom/ipt2socks
